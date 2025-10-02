@@ -1,4 +1,4 @@
-rootProject.name = "RenPy"
+rootProject.name = "renpy-jetbrains-plugin"
 
 buildCache {
     local {
