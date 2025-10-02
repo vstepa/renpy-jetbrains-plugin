@@ -24,14 +24,6 @@ dependencies {
         // Add necessary plugin dependencies for compilation here, example:
         // bundledPlugin("com.intellij.java")
     }
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-
-    // FIXME: Needed to run kotlin code during debug outside of IDE, must not be included in final build
-    implementation(kotlin("stdlib-jdk8"))
-
-    // FIXME: Needed for playing with reflection, must not be included in final build
-    implementation(kotlin("reflect"))
 }
 
 intellijPlatform {
