@@ -1,0 +1,69 @@
+<idea-plugin require-restart="false">
+    <id>ee.vstepa.jetbrains.plugins.renpy</id>
+    <name>Ren'Py Support</name>
+    <version>0.0.1-b1</version>
+
+    <vendor
+            url="https://github.com/vstepa"
+            email="vstepa.vs@gmail.com">
+        vstepa
+    </vendor>
+
+    <description><![CDATA[
+        <style>
+            .wip {
+                color: red;
+                font-weight: bold; /* optional, to make it stand out */
+            }
+        </style>
+
+        <p>
+            Ren'Py Visual Novel Engine support.
+        </p>
+        <div>
+            <p>
+                Features:
+            </p>
+            <ul>
+                <li><span class="wip">[WORK IN PROGRESS]</span> Syntax highlighting</li>
+                <li><span class="wip">[WORK IN PROGRESS]</span> Code completion</li>
+                <li><span class="wip">[WORK IN PROGRESS]</span> Snippets</li>
+            </ul>
+        </div>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <style>
+            li.main {
+                list-style-type: none;
+            }
+        </style>
+
+        <h1>Changelog</h2>
+        <hr>
+        <h2>Legend</h3>
+        <ul>
+            <li class="main"><code>[+]</code> - something was added</li>
+            <li class="main"><code>[-]</code> - something was removed</li>
+            <li class="main"><code>[*]</code> - something was fixed</li>
+            <li class="main"><code>[!]</code> - important note</li>
+        </ul>
+        <!--<hr>-->
+        <!--<h2>0.0.2</h3>-->
+        <!--<ul>-->
+        <!--    <li class="main">...</li>-->
+        <!--</ul>-->
+        <hr>
+        <h2>0.0.1</h3>
+        <h3>UI</h4>
+        <ul>
+            <li class="main"><code>[+]</code> Updated plugin logo from default to Ren'Py logo</li>
+        </ul>
+<!--        <h3>Syntax highlighting</h4>-->
+<!--        <ul>-->
+<!--            <li class="main"><code>[+]</code> ...</li>-->
+<!--        </ul>-->
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>
