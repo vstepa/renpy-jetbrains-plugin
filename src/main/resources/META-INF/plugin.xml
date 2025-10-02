@@ -1,7 +1,7 @@
 <idea-plugin require-restart="false">
     <id>ee.vstepa.jetbrains.plugins.renpy</id>
     <name>Ren'Py Support</name>
-    <version>0.0.1-b1</version>
+    <version>0.0.1-252</version>
 
     <vendor
             url="https://github.com/vstepa"
@@ -39,9 +39,9 @@
             }
         </style>
 
-        <h1>Changelog</h2>
+        <h1>Changelog</h1>
         <hr>
-        <h2>Legend</h3>
+        <h2>Legend</h2>
         <ul>
             <li class="main"><code>[+]</code> - something was added</li>
             <li class="main"><code>[-]</code> - something was removed</li>
@@ -49,21 +49,41 @@
             <li class="main"><code>[!]</code> - important note</li>
         </ul>
         <!--<hr>-->
-        <!--<h2>0.0.2</h3>-->
+        <!--<h2>0.0.2</h2>-->
         <!--<ul>-->
         <!--    <li class="main">...</li>-->
         <!--</ul>-->
         <hr>
-        <h2>0.0.1</h3>
-        <h3>UI</h4>
+        <h2>0.0.1-252</h2>
+        <h3>Functional</h3>
+        <ul>
+            <li class="main"><code>[+]</code> Added "Ren'Py Script" (*.rpy files) and "Ren'Py Compiled Script" (*.rpyc files) file types</li>
+        </ul>
+        <h3>UI</h3>
         <ul>
             <li class="main"><code>[+]</code> Updated plugin logo from default to Ren'Py logo</li>
+            <li class="main"><code>[+]</code> Added icons for "Ren'Py Script" and "Ren'Py Compiled Script" file types</li>
         </ul>
-<!--        <h3>Syntax highlighting</h4>-->
+<!--        <h3>Syntax highlighting</h3>-->
 <!--        <ul>-->
 <!--            <li class="main"><code>[+]</code> ...</li>-->
 <!--        </ul>-->
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Ren'Py Script File"
+                  implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyScriptFileType"
+                  fieldName="INSTANCE"
+                  language="Ren'Py Script"
+                  extensions="rpy"
+        />
+        <fileType name="Ren'Py Compiled Script File"
+                  implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyCompiledScriptFileType"
+                  fieldName="INSTANCE"
+                  language="Ren'Py Script"
+                  extensions="rpyc"
+        />
+    </extensions>
 </idea-plugin>
