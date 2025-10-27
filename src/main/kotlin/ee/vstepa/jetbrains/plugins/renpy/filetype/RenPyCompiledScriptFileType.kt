@@ -2,9 +2,9 @@ package ee.vstepa.jetbrains.plugins.renpy.filetype
 
 import com.intellij.openapi.fileTypes.LanguageFileType
 import ee.vstepa.jetbrains.plugins.renpy.RenPyIcons
-import ee.vstepa.jetbrains.plugins.renpy.RenPyScriptLanguage
+import ee.vstepa.jetbrains.plugins.renpy.lang.RenPyScriptLanguage
 
-class RenPyCompiledScriptFileType private constructor() : LanguageFileType(RenPyScriptLanguage) {
+class RenPyCompiledScriptFileType private constructor() : LanguageFileType(RenPyScriptLanguage.INSTANCE) {
     override fun getName() = "Ren'Py Compiled Script File"
     override fun getDescription() = "Ren'Py compiled script language file"
     override fun getDefaultExtension() = "rpyc"

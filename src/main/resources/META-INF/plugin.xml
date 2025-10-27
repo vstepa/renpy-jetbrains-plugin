@@ -73,17 +73,29 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileType name="Ren'Py Script File"
-                  implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyScriptFileType"
-                  fieldName="INSTANCE"
-                  language="Ren'Py Script"
-                  extensions="rpy"
+        <fileType
+                name="Ren'Py Script File"
+                implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyScriptFileType"
+                fieldName="INSTANCE"
+                language="Ren'Py Script"
+                extensions="rpy"
         />
-        <fileType name="Ren'Py Compiled Script File"
-                  implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyCompiledScriptFileType"
-                  fieldName="INSTANCE"
-                  language="Ren'Py Script"
-                  extensions="rpyc"
+        <fileType
+                name="Ren'Py Compiled Script File"
+                implementationClass="ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyCompiledScriptFileType"
+                fieldName="INSTANCE"
+                language="Ren'Py Script"
+                extensions="rpyc"
+        />
+
+        <applicationService
+                serviceInterface="ee.vstepa.jetbrains.plugins.renpy.lang.script.RenPyScriptElementFactory"
+                serviceImplementation="ee.vstepa.jetbrains.plugins.renpy.lang.script.RenPyScriptElementFactoryImpl"
+        />
+
+        <lang.parserDefinition
+                language="Ren'Py Script"
+                implementationClass="ee.vstepa.jetbrains.plugins.renpy.lang.script.RenPyScriptParserDefinition"
         />
     </extensions>
 </idea-plugin>
