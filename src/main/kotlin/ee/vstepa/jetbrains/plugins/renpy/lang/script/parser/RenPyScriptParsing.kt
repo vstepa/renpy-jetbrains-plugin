@@ -2,7 +2,7 @@ package ee.vstepa.jetbrains.plugins.renpy.lang.script.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilder.Marker
-import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.util.NlsContexts.ParsingError
 import com.intellij.psi.tree.IElementType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenSets
@@ -37,6 +37,9 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             } else if (isTokenBlockStatementStart()) {
                 // Start of label, menu
                 success = parseBlockStatement()
+            } else if (token == RenPyScriptTokenTypes.JUMP_KEYWORD) {
+                // Start of jump ... or jump expression ...
+                success = parseJumpStatement()
             } else if (token == RenPyScriptTokenTypes.DEDENT) {
                 // End of current statements list
                 advance()
@@ -46,7 +49,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
                 success = false
             }
 
-            if (!success) advanceToNextLineOrIndentDedent()
+            if (!success) advanceToNewLineOrEqualOrEof()
         }
 
         statementsListMarker.done(RenPyScriptElementTypes.STMTS_LIST)
@@ -102,11 +105,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             success = false
         }
 
-        val lastToken = token()
-        if (!(lastToken == RenPyScriptTokenTypes.NEW_LINE || lastToken == RenPyScriptTokenTypes.INDENT || lastToken == RenPyScriptTokenTypes.DEDENT || eof())) {
-            error("New line is expected at the end of the label statement")
-            success = false
-        }
+        success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the label statement") && success
 
         labelStatementMarker.done(RenPyScriptElementTypes.LABEL_STMT)
 
@@ -147,7 +146,60 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             success = false
         }
 
+        success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the dialog statement") && success
+
         dialogStatementMarker.done(RenPyScriptElementTypes.DIALOG_STMT)
+        return success
+    }
+
+    open fun parseJumpStatement(): Boolean {
+        var token = token()
+        if (token != RenPyScriptTokenTypes.JUMP_KEYWORD) {
+            error("Invalid jump statement start token: $token")
+            return false
+        }
+
+        val jumpStatementMarker = mark()
+
+        val jumpStatementKeywordMarker = mark()
+        advance()
+        jumpStatementKeywordMarker.done(RenPyScriptElementTypes.JUMP_STMT_KEYWORD)
+
+        var success = true
+        token = token()
+        when (token) {
+            RenPyScriptTokenTypes.EXPRESSION_KEYWORD -> {
+                val jumpStatementExpressionMarker = mark()
+                val jumpStatementExpressionKeywordMarker = mark()
+                advance()
+                jumpStatementExpressionKeywordMarker.done(RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_KEYWORD)
+
+                val jumpStatementExpressionValueMarker = mark()
+                if (isTokenExpressionValue()) {
+                    advance()
+                    jumpStatementExpressionValueMarker.done(RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_VALUE)
+                } else {
+                    error("Jump statement expression expected")
+                    jumpStatementExpressionValueMarker.drop()
+                    success = false
+                }
+
+                jumpStatementExpressionMarker.done(RenPyScriptElementTypes.JUMP_STMT_EXPRESSION)
+            }
+            RenPyScriptTokenTypes.IDENTIFIER -> {
+                val jumpStatementTargetMarker = mark()
+                advance()
+                jumpStatementTargetMarker.done(RenPyScriptElementTypes.JUMP_STMT_TARGET)
+            }
+            else -> {
+                error("Jump statement target or expression expected")
+                success = false
+            }
+        }
+
+        success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the jump statement") && success
+
+        jumpStatementMarker.done(RenPyScriptElementTypes.JUMP_STMT)
         return success
     }
 
@@ -155,17 +207,15 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         this.builder.advanceLexer()
     }
 
-    protected fun advanceToNextLineOrIndentDedent() {
+    protected fun advanceToNewLineOrEqualOrEof() {
         var errorMarker: Marker? = null
         while (true) {
-            val token = token()
-            if (eof() || token == RenPyScriptTokenTypes.INDENT || token == RenPyScriptTokenTypes.DEDENT || token == RenPyScriptTokenTypes.NEW_LINE) {
-                errorMarker?.drop()
+            if (eof() || RenPyScriptTokenSets.NEW_LINE_OR_EQUALS.contains(token())) {
+                flushError(errorMarker, "Unexpected tokens")
                 break
             }
-            flushError(errorMarker, "Unexpected token: $token")
+            if (errorMarker == null) errorMarker = mark()
             advance()
-            errorMarker = mark()
         }
     }
 
@@ -186,7 +236,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     protected fun mark(): Marker = this.builder.mark()
 
-    protected fun error(@NlsContexts.ParsingError message: String) {
+    protected fun error(@ParsingError message: String) {
         this.builder.error(message)
     }
 
@@ -194,12 +244,20 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     protected open fun isTokenDialogueStatementStart(): Boolean = RenPyScriptTokenSets.DIALOGUE_STATEMENT_STARTS.contains(token())
 
+    protected open fun isTokenExpressionValue(): Boolean = RenPyScriptTokenSets.EXPRESSION_VALUES.contains(token())
+
+    protected open fun verifyTokenIsNewLineOrEqualOrEof(@ParsingError errorMessage: String): Boolean {
+        if (eof() || RenPyScriptTokenSets.NEW_LINE_OR_EQUALS.contains(token())) return true
+        error(errorMessage)
+        return false
+    }
+
     companion object {
         fun isRenPyScriptToken(tokenType: IElementType?): Boolean {
             return tokenType != null && tokenType is RenPyScriptTokenType
         }
 
-        fun flushError(errorMarker: Marker?, message: String = "Unexpected error while parsing Ren'Py Script: flushing"): Marker? {
+        fun flushError(errorMarker: Marker?, @ParsingError message: String = "Unexpected error while parsing Ren'Py Script: flushing"): Marker? {
             errorMarker?.error(message)
             return null
         }

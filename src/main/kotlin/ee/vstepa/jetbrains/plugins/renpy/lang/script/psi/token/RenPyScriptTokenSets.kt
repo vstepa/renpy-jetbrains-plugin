@@ -20,4 +20,17 @@ object RenPyScriptTokenSets {
         RenPyScriptTokenTypes.IDENTIFIER,
         RenPyScriptTokenTypes.STRING
     )
+
+    @JvmField
+    val EXPRESSION_VALUES = TokenSet.create(
+        RenPyScriptTokenTypes.IDENTIFIER,
+        RenPyScriptTokenTypes.STRING
+    )
+
+    @JvmField
+    val NEW_LINE_OR_EQUALS = TokenSet.create(
+        RenPyScriptTokenTypes.NEW_LINE,
+        RenPyScriptTokenTypes.INDENT,
+        RenPyScriptTokenTypes.DEDENT
+    )
 }

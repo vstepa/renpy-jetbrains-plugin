@@ -25,6 +25,12 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.DIALOG_STMT -> RenPyScriptDialogStmtImpl(node)
             RenPyScriptElementTypes.DIALOG_STMT_IDENTIFIER -> RenPyScriptDialogStmtIdentifierImpl(node)
             RenPyScriptElementTypes.DIALOG_STMT_TEXT -> RenPyScriptDialogStmtTextImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT -> RenPyScriptJumpStmtImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT_KEYWORD -> RenPyScriptJumpStmtKeywordImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT_TARGET -> RenPyScriptJumpStmtTargetImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT_EXPRESSION -> RenPyScriptJumpStmtExpressionImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_KEYWORD -> RenPyScriptJumpStmtExpressionKeywordImpl(node)
+            RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_VALUE -> RenPyScriptJumpStmtExpressionValueImpl(node)
 
             else -> throw UnsupportedNodeElementTypeException(node)
         }

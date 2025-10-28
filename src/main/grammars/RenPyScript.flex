@@ -23,6 +23,7 @@ IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_-]*
 STRING = \"([^\\\"\n\r]|\\.)*\" | \'([^\\\'\n\r]|\\.)*\'
 COMMENT = \#.*
 //PLAIN_NUMBER = [0-9]+
+QUICK_PYTHON_STATEMENT = \$ [^\r\n]*
 
 %%
 
@@ -63,13 +64,15 @@ COMMENT = \#.*
 "label"        { return RenPyScriptTokenTypes.LABEL_KEYWORD; }
 "menu"         { return RenPyScriptTokenTypes.MENU_KEYWORD; }
 "jump"         { return RenPyScriptTokenTypes.JUMP_KEYWORD; }
-//"scene" { return RenPyScriptTypes.SCENE_KEYWORD; }
-//"with" { return RenPyScriptTypes.WITH_KEYWORD; }
-//"show" { return RenPyScriptTypes.SHOW_KEYWORD; }
-//"hide" { return RenPyScriptTypes.HIDE_KEYWORD; }
+"scene" { return RenPyScriptTokenTypes.SCENE_KEYWORD; }
+"with" { return RenPyScriptTokenTypes.WITH_KEYWORD; }
+"show" { return RenPyScriptTokenTypes.SHOW_KEYWORD; }
+"hide" { return RenPyScriptTokenTypes.HIDE_KEYWORD; }
+"expression" { return RenPyScriptTokenTypes.EXPRESSION_KEYWORD; }
 //"play" { return RenPyScriptTypes.PLAY_KEYWORD; }
 //"sound" { return RenPyScriptTypes.SOUND_KEYWORD; }
 //"$"    { return RenPyScriptTypes.QUICK_PYTHON_KEYWORD; }
+{QUICK_PYTHON_STATEMENT} { return RenPyScriptTokenTypes.QUICK_PYTHON_STATEMENT; }
 //"=" { return RenPyScriptTypes.EQ; }
 //"." { return RenPyScriptTypes.DOT; }
 //{PLAIN_NUMBER} { return RenPyScriptTypes.NUMBER; }

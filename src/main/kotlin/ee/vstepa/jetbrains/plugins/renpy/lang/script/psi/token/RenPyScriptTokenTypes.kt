@@ -10,10 +10,18 @@ object RenPyScriptTokenTypes {
     @JvmField val LABEL_KEYWORD = RenPyScriptTokenType("LABEL_KEYWORD")
     @JvmField val JUMP_KEYWORD = RenPyScriptTokenType("JUMP_KEYWORD")
     @JvmField val MENU_KEYWORD = RenPyScriptTokenType("MENU_KEYWORD")
+    @JvmField val SCENE_KEYWORD = RenPyScriptTokenType("SCENE_KEYWORD")
+    @JvmField val WITH_KEYWORD = RenPyScriptTokenType("WITH_KEYWORD")
+    @JvmField val SHOW_KEYWORD = RenPyScriptTokenType("SHOW_KEYWORD")
+    @JvmField val HIDE_KEYWORD = RenPyScriptTokenType("HIDE_KEYWORD")
+    @JvmField val EXPRESSION_KEYWORD = RenPyScriptTokenType("EXPRESSION_KEYWORD")
 
     // Indent/Dedent
     @JvmField val INDENT = RenPyScriptTokenType("INDENT")
     @JvmField val DEDENT = RenPyScriptTokenType("DEDENT")
+
+    // Python
+    @JvmField val QUICK_PYTHON_STATEMENT = RenPyScriptTokenType("QUICK_PYTHON_STATEMENT")
 
     // Others
     @JvmField val IDENTIFIER = RenPyScriptTokenType("IDENTIFIER")
