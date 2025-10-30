@@ -33,4 +33,13 @@ object RenPyScriptTokenSets {
         RenPyScriptTokenTypes.INDENT,
         RenPyScriptTokenTypes.DEDENT
     )
+
+    @JvmField
+    val SHOW_OR_SCENE_PARAM_KEYWORDS = TokenSet.create(
+        RenPyScriptTokenTypes.AS_KEYWORD,
+        RenPyScriptTokenTypes.AT_KEYWORD,
+        RenPyScriptTokenTypes.BEHIND_KEYWORD,
+        RenPyScriptTokenTypes.ONLAYER_KEYWORD,
+        RenPyScriptTokenTypes.ZORDER_KEYWORD
+    )
 }

@@ -5,7 +5,15 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.UnsupportedNodeElementTypeException
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.RenPyScriptFile
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.*
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtIdentifierImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtTextIdentifierImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtTextImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.RenPyScriptImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.RenPyScriptStmtsListImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.jump.impl.*
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.*
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.show.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
 
 class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
@@ -16,21 +24,41 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
 
         return when(elementType) {
             RenPyScriptElementTypes.REN_PY_SCRIPT -> RenPyScriptImpl(node)
+
+            RenPyScriptElementTypes.STMTS_LIST -> RenPyScriptStmtsListImpl(node)
+
             RenPyScriptElementTypes.LABEL -> RenPyScriptLabelImpl(node)
             RenPyScriptElementTypes.LABEL_STMT -> RenPyScriptLabelStmtImpl(node)
             RenPyScriptElementTypes.LABEL_STMT_COLON -> RenPyScriptLabelStmtColonImpl(node)
             RenPyScriptElementTypes.LABEL_STMT_KEYWORD -> RenPyScriptLabelStmtKeywordImpl(node)
             RenPyScriptElementTypes.LABEL_STMT_NAME -> RenPyScriptLabelStmtNameImpl(node)
-            RenPyScriptElementTypes.STMTS_LIST -> RenPyScriptStmtsListImpl(node)
+
             RenPyScriptElementTypes.DIALOG_STMT -> RenPyScriptDialogStmtImpl(node)
             RenPyScriptElementTypes.DIALOG_STMT_IDENTIFIER -> RenPyScriptDialogStmtIdentifierImpl(node)
             RenPyScriptElementTypes.DIALOG_STMT_TEXT -> RenPyScriptDialogStmtTextImpl(node)
+            RenPyScriptElementTypes.DIALOG_STMT_TEXT_IDENTIFIER -> RenPyScriptDialogStmtTextIdentifierImpl(node)
+
             RenPyScriptElementTypes.JUMP_STMT -> RenPyScriptJumpStmtImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_KEYWORD -> RenPyScriptJumpStmtKeywordImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_TARGET -> RenPyScriptJumpStmtTargetImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION -> RenPyScriptJumpStmtExpressionImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_KEYWORD -> RenPyScriptJumpStmtExpressionKeywordImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_VALUE -> RenPyScriptJumpStmtExpressionValueImpl(node)
+
+            RenPyScriptElementTypes.SHOW_STMT -> RenPyScriptShowStmtImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_KEYWORD -> RenPyScriptShowStmtKeywordImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_IMAGE -> RenPyScriptShowStmtImageImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_IMAGE_PART -> RenPyScriptShowStmtImagePartImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_EXPRESSION -> RenPyScriptShowStmtExpressionImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_EXPRESSION_KEYWORD -> RenPyScriptShowStmtExpressionKeywordImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_EXPRESSION_VALUE -> RenPyScriptShowStmtExpressionValueImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_PROPS_LIST -> RenPyScriptShowStmtPropsListImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_PROP -> RenPyScriptShowStmtPropImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_PROP_KEYWORD -> RenPyScriptShowStmtPropKeywordImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_PROP_VALUE -> RenPyScriptShowStmtPropValueImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE -> RenPyScriptShowStmtWithClauseImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE_KEYWORD -> RenPyScriptShowStmtWithClauseKeywordImpl(node)
+            RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE_VALUE -> RenPyScriptShowStmtWithClauseValueImpl(node)
 
             else -> throw UnsupportedNodeElementTypeException(node)
         }

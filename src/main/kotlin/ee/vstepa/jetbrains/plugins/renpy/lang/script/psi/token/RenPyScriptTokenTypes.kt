@@ -16,6 +16,13 @@ object RenPyScriptTokenTypes {
     @JvmField val HIDE_KEYWORD = RenPyScriptTokenType("HIDE_KEYWORD")
     @JvmField val EXPRESSION_KEYWORD = RenPyScriptTokenType("EXPRESSION_KEYWORD")
 
+    // Keywords - show/scene props
+    @JvmField val AS_KEYWORD = RenPyScriptTokenType("AS_KEYWORD")
+    @JvmField val AT_KEYWORD = RenPyScriptTokenType("AT_KEYWORD")
+    @JvmField val BEHIND_KEYWORD = RenPyScriptTokenType("BEHIND_KEYWORD")
+    @JvmField val ONLAYER_KEYWORD = RenPyScriptTokenType("ONLAYER_KEYWORD")
+    @JvmField val ZORDER_KEYWORD = RenPyScriptTokenType("ZORDER_KEYWORD")
+
     // Indent/Dedent
     @JvmField val INDENT = RenPyScriptTokenType("INDENT")
     @JvmField val DEDENT = RenPyScriptTokenType("DEDENT")
@@ -30,4 +37,6 @@ object RenPyScriptTokenTypes {
     @JvmField val COLON = RenPyScriptTokenType("COLON")
     @JvmField val NEW_LINE = RenPyScriptTokenType("NEW_LINE")
     @JvmField val EMPTY_LINE = RenPyScriptTokenType("EMPTY_LINE")
+    @JvmField val COMMA = RenPyScriptTokenType("COMMA")
+    @JvmField val PLAIN_NUMBER = RenPyScriptTokenType("PLAIN_NUMBER")
 }

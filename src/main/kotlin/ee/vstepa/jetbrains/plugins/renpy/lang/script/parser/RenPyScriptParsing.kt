@@ -18,7 +18,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         scriptMarker.done(RenPyScriptElementTypes.REN_PY_SCRIPT)
     }
 
-    open fun parseStatementsList(advance: Boolean = false): Boolean {
+    protected open fun parseStatementsList(advance: Boolean = false): Boolean {
         val statementsListMarker = mark()
         if (advance) advance()
 
@@ -40,12 +40,18 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             } else if (token == RenPyScriptTokenTypes.JUMP_KEYWORD) {
                 // Start of jump ... or jump expression ...
                 success = parseJumpStatement()
+            } else if (token == RenPyScriptTokenTypes.SHOW_KEYWORD) {
+                // Start of show ... or show expression ...
+                success = parseShowStatement()
             } else if (token == RenPyScriptTokenTypes.DEDENT) {
                 // End of current statements list
                 advance()
                 break
             } else {
-                error("Unexpected statement start token: $token")
+                mark().also {
+                    advance()
+                    flushError(it, "Unexpected statement start token: $token")
+                }
                 success = false
             }
 
@@ -56,7 +62,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         return true
     }
 
-    open fun parseBlockStatement(): Boolean {
+    protected open fun parseBlockStatement(): Boolean {
         when (val token = token()) {
             RenPyScriptTokenTypes.LABEL_KEYWORD -> {
                 return parseLabel()
@@ -71,7 +77,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         }
     }
 
-    open fun parseLabel(): Boolean {
+    protected open fun parseLabel(): Boolean {
         if (token() != RenPyScriptTokenTypes.LABEL_KEYWORD) {
             error("Invalid label start token: ${token()}")
             return false
@@ -117,11 +123,11 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         return success
     }
 
-    open fun parseMenu(): Boolean {
+    protected open fun parseMenu(): Boolean {
         return false
     }
 
-    open fun parseDialogStatement(): Boolean {
+    protected open fun parseDialogStatement(): Boolean {
         if (!isTokenDialogueStatementStart()) {
             error("Invalid dialog statement start token: ${token()}")
             return false
@@ -129,10 +135,19 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
         val dialogStatementMarker = mark()
 
-        if (token() == RenPyScriptTokenTypes.IDENTIFIER) {
-            val dialogStatementIdentifierMarker = mark()
-            advance()
-            dialogStatementIdentifierMarker.done(RenPyScriptElementTypes.DIALOG_STMT_IDENTIFIER)
+        when (token()) {
+            RenPyScriptTokenTypes.IDENTIFIER -> {
+                val dialogStatementIdentifierMarker = mark()
+                advance()
+                dialogStatementIdentifierMarker.done(RenPyScriptElementTypes.DIALOG_STMT_IDENTIFIER)
+            }
+            RenPyScriptTokenTypes.STRING if (tokenAhead() == RenPyScriptTokenTypes.STRING) -> {
+                // Our token text identifier is also a text line
+                // Dialog line looks like this: "John" "Hello, my name is John!"
+                val dialogStatementTextIdentifierMarker = mark()
+                advance()
+                dialogStatementTextIdentifierMarker.done(RenPyScriptElementTypes.DIALOG_STMT_TEXT_IDENTIFIER)
+            }
         }
 
         var success = true
@@ -152,7 +167,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         return success
     }
 
-    open fun parseJumpStatement(): Boolean {
+    protected open fun parseJumpStatement(): Boolean {
         var token = token()
         if (token != RenPyScriptTokenTypes.JUMP_KEYWORD) {
             error("Invalid jump statement start token: $token")
@@ -203,6 +218,150 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         return success
     }
 
+    protected open fun parseShowStatement(): Boolean {
+        var token = token()
+        if (token != RenPyScriptTokenTypes.SHOW_KEYWORD) {
+            error("Invalid show statement start token: $token")
+            return false
+        }
+
+        val showStatementMarker = mark()
+
+        val showStatementKeywordMarker = mark()
+        advance()
+        showStatementKeywordMarker.done(RenPyScriptElementTypes.SHOW_STMT_KEYWORD)
+
+        var success = true
+        token = token()
+        when (token) {
+            RenPyScriptTokenTypes.EXPRESSION_KEYWORD -> {
+                val showStatementExpressionMarker = mark()
+                val showStatementExpressionKeywordMarker = mark()
+                advance()
+                showStatementExpressionKeywordMarker.done(RenPyScriptElementTypes.SHOW_STMT_EXPRESSION_KEYWORD)
+
+                val showStatementExpressionValueMarker = mark()
+                if (isTokenExpressionValue()) {
+                    advance()
+                    showStatementExpressionValueMarker.done(RenPyScriptElementTypes.SHOW_STMT_EXPRESSION_VALUE)
+                } else {
+                    error("Show statement expression expected")
+                    showStatementExpressionValueMarker.drop()
+                    success = false
+                }
+
+                showStatementExpressionMarker.done(RenPyScriptElementTypes.SHOW_STMT_EXPRESSION)
+            }
+            RenPyScriptTokenTypes.IDENTIFIER -> {
+                val showStatementImageMarker = mark()
+                while (token() == RenPyScriptTokenTypes.IDENTIFIER) {
+                    val showStatementImagePartMarker = mark()
+                    advance()
+                    showStatementImagePartMarker.done(RenPyScriptElementTypes.SHOW_STMT_IMAGE_PART)
+                }
+                showStatementImageMarker.done(RenPyScriptElementTypes.SHOW_STMT_IMAGE)
+            }
+            else -> {
+                error("Show statement image identifier or expression expected")
+                success = false
+            }
+        }
+
+        if (isTokenShowOrScenePropName()) {
+            val showStatementPropsListMarker = mark()
+
+            while (true) {
+                val propKeywordToken = token()
+                val showStatementPropMarker = mark()
+                val showStatementPropKeywordMarker = mark()
+                advance()
+                showStatementPropKeywordMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROP_KEYWORD)
+
+                val showStatementPropValMarker = mark()
+                val currentToken = token()
+                when (propKeywordToken) {
+                    RenPyScriptTokenTypes.AS_KEYWORD, RenPyScriptTokenTypes.ONLAYER_KEYWORD -> {
+                        if (currentToken == RenPyScriptTokenTypes.IDENTIFIER) {
+                            advance()
+                            showStatementPropValMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROP_VALUE)
+                        } else {
+                            if (propKeywordToken == RenPyScriptTokenTypes.AS_KEYWORD) {
+                                error("A 'name' is expected as 'as' property value")
+                            } else {
+                                error("A 'name' of layer is expected as 'onlayer' property value")
+                            }
+                            showStatementPropValMarker.drop()
+                            success = false
+                        }
+                    }
+                    RenPyScriptTokenTypes.AT_KEYWORD, RenPyScriptTokenTypes.BEHIND_KEYWORD -> {
+                        if (currentToken == RenPyScriptTokenTypes.IDENTIFIER) {
+                            advance()
+                            while (token() == RenPyScriptTokenTypes.COMMA && tokenAhead() == RenPyScriptTokenTypes.IDENTIFIER) {
+                                advance()
+                                advance()
+                            }
+                            showStatementPropValMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROP_VALUE)
+                        } else {
+                            if (propKeywordToken == RenPyScriptTokenTypes.AT_KEYWORD) {
+                                error("An 'expression' or a list of 'expressions' is expected as 'at' property value")
+                            } else {
+                                error("A 'name' or a list of 'names' is expected as 'behind' property value")
+                            }
+                            showStatementPropValMarker.drop()
+                            success = false
+                        }
+                    }
+                    RenPyScriptTokenTypes.ZORDER_KEYWORD -> {
+                        if (currentToken == RenPyScriptTokenTypes.IDENTIFIER || currentToken == RenPyScriptTokenTypes.STRING || currentToken == RenPyScriptTokenTypes.PLAIN_NUMBER) {
+                            advance()
+                            showStatementPropValMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROP_VALUE)
+                        } else {
+                            error("An 'integer' is expected as 'zorder' property value")
+                            showStatementPropValMarker.drop()
+                            success = false
+                        }
+                    }
+                    else -> {
+                        error("Unexpected 'show' property keyword: $propKeywordToken")
+                        showStatementPropValMarker.drop()
+                        success = false
+                    }
+                }
+
+                showStatementPropMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROP)
+
+                if (eof() || RenPyScriptTokenSets.NEW_LINE_OR_EQUALS.contains(token()) || !isTokenShowOrScenePropName()) break
+            }
+
+            showStatementPropsListMarker.done(RenPyScriptElementTypes.SHOW_STMT_PROPS_LIST)
+        }
+
+        token = token()
+        if (token == RenPyScriptTokenTypes.WITH_KEYWORD) {
+            val showStatementWithClauseMarker = mark()
+            val showStatementWithClauseKeywordMarker = mark()
+            advance()
+            showStatementWithClauseKeywordMarker.done(RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE_KEYWORD)
+
+            val showStatementWithClauseValueMarker = mark()
+            if (token() == RenPyScriptTokenTypes.IDENTIFIER) {
+                advance()
+                showStatementWithClauseValueMarker.done(RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE_VALUE)
+            } else {
+                error("An 'expression' is expected as 'show' statement 'with' clause value")
+                showStatementWithClauseValueMarker.drop()
+                success = false
+            }
+            showStatementWithClauseMarker.done(RenPyScriptElementTypes.SHOW_STMT_WITH_CLAUSE)
+        }
+
+        success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'show' statement") && success
+
+        showStatementMarker.done(RenPyScriptElementTypes.SHOW_STMT)
+        return success
+    }
+
     protected fun advance() {
         this.builder.advanceLexer()
     }
@@ -232,6 +391,10 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     protected fun token(): IElementType? = this.builder.tokenType
 
+    protected fun tokenAhead(step: Int = 1): IElementType? = this.builder.lookAhead(step)
+
+    protected fun tokenText(): String? = this.builder.tokenText
+
     protected fun eof(): Boolean = this.builder.eof()
 
     protected fun mark(): Marker = this.builder.mark()
@@ -245,6 +408,8 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
     protected open fun isTokenDialogueStatementStart(): Boolean = RenPyScriptTokenSets.DIALOGUE_STATEMENT_STARTS.contains(token())
 
     protected open fun isTokenExpressionValue(): Boolean = RenPyScriptTokenSets.EXPRESSION_VALUES.contains(token())
+
+    protected open fun isTokenShowOrScenePropName(): Boolean = RenPyScriptTokenSets.SHOW_OR_SCENE_PARAM_KEYWORDS.contains(token())
 
     protected open fun verifyTokenIsNewLineOrEqualOrEof(@ParsingError errorMessage: String): Boolean {
         if (eof() || RenPyScriptTokenSets.NEW_LINE_OR_EQUALS.contains(token())) return true
