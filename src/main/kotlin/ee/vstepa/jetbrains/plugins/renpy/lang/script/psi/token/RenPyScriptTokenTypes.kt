@@ -32,11 +32,11 @@ object RenPyScriptTokenTypes {
 
     // Others
     @JvmField val IDENTIFIER = RenPyScriptTokenType("IDENTIFIER")
+    @JvmField val IMAGE_LABEL_IDENTIFIER = RenPyScriptTokenType("IMAGE_LABEL_IDENTIFIER")
     @JvmField val STRING = RenPyScriptTokenType("STRING")
     @JvmField val COMMENT = RenPyScriptTokenType("COMMENT")
     @JvmField val COLON = RenPyScriptTokenType("COLON")
     @JvmField val NEW_LINE = RenPyScriptTokenType("NEW_LINE")
-    @JvmField val EMPTY_LINE = RenPyScriptTokenType("EMPTY_LINE")
     @JvmField val COMMA = RenPyScriptTokenType("COMMA")
     @JvmField val PLAIN_NUMBER = RenPyScriptTokenType("PLAIN_NUMBER")
 }

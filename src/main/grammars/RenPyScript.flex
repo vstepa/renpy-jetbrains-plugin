@@ -12,33 +12,39 @@ import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenT
 %type IElementType
 %unicode
 
-//%{
-//  private Stack<Integer> indents = new Stack<>();
-//  private int pendingDedents = 0;
-//%}
-
-NEW_LINE = \r?\n
+NEW_LINE = \r?\n[ ]*
 WS = [ ]+
-IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_-]*
+IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_]*
+IMAGE_LABEL_IDENTIFIER = [a-zA-Z0-9_][a-zA-Z0-9_-]*
 STRING = \"([^\\\"\n\r]|\\.)*\" | \'([^\\\'\n\r]|\\.)*\'
 COMMENT = \#.*
-PLAIN_NUMBER = [0-9]+
 QUICK_PYTHON_STATEMENT = \$ [^\r\n]*
 
 %%
 
 {NEW_LINE} {
+    CharSequence cs = yytext();
     int spaces = 0;
+    int indentChars = 0;
+    for (int i = 0; i < cs.length(); i++) {
+        char c = cs.charAt(i);
+        if (c == ' ') {
+            spaces++;
+            continue;
+        }
+        if (c == '\r' || c == '\n') {
+            indentChars++;
+            continue;
+        }
+    }
+
     try {
-        while (yycharat(++spaces) == ' ');
+        char charPostMatched = yycharat(spaces + indentChars);
+        if (charPostMatched == '\n' || charPostMatched == '\r') return RenPyScriptTokenTypes.NEW_LINE;
     } catch (IndexOutOfBoundsException e) {
         return RenPyScriptTokenTypes.NEW_LINE;
     }
-    char postSpacesChar = yycharat(spaces);
-    if (postSpacesChar == '\n' || postSpacesChar == '\r') {
-        return RenPyScriptTokenTypes.NEW_LINE;
-    }
-    spaces--;
+
     if (spaces > 0) yybegin(YYINITIAL);
 
     int prevIndent = getIndents().isEmpty() ? 0 : getIndents().peek();
@@ -83,7 +89,23 @@ QUICK_PYTHON_STATEMENT = \$ [^\r\n]*
 //"." { return RenPyScriptTypes.DOT; }
 "," { return RenPyScriptTokenTypes.COMMA; }
 {IDENTIFIER}        { return RenPyScriptTokenTypes.IDENTIFIER; }
-{PLAIN_NUMBER} { return RenPyScriptTokenTypes.PLAIN_NUMBER; }
+{IMAGE_LABEL_IDENTIFIER} {
+    CharSequence cs = yytext();
+    boolean allDigits = true;
+
+    for (int i = 0; i < cs.length(); i++) {
+        if (!Character.isDigit(cs.charAt(i))) {
+            allDigits = false;
+            break;
+        }
+    }
+
+    if (allDigits) {
+        return RenPyScriptTokenTypes.PLAIN_NUMBER;
+    }
+
+    return RenPyScriptTokenTypes.IMAGE_LABEL_IDENTIFIER;
+}
 ":"            { return RenPyScriptTokenTypes.COLON; }
 
 .            { return TokenType.BAD_CHARACTER; }

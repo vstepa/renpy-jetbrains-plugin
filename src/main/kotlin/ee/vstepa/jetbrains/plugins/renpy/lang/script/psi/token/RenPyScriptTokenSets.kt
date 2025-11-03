@@ -22,13 +22,19 @@ object RenPyScriptTokenSets {
     )
 
     @JvmField
+    val IMAGE_DISPLAY_CONTROL_STATEMENT_STARTS = TokenSet.create(
+        RenPyScriptTokenTypes.SHOW_KEYWORD,
+        RenPyScriptTokenTypes.SCENE_KEYWORD
+    )
+
+    @JvmField
     val EXPRESSION_VALUES = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
         RenPyScriptTokenTypes.STRING
     )
 
     @JvmField
-    val NEW_LINE_OR_EQUALS = TokenSet.create(
+    val NEW_LINE_OR_SIMILAR_TO_IT_TOKENS = TokenSet.create(
         RenPyScriptTokenTypes.NEW_LINE,
         RenPyScriptTokenTypes.INDENT,
         RenPyScriptTokenTypes.DEDENT
@@ -41,5 +47,12 @@ object RenPyScriptTokenSets {
         RenPyScriptTokenTypes.BEHIND_KEYWORD,
         RenPyScriptTokenTypes.ONLAYER_KEYWORD,
         RenPyScriptTokenTypes.ZORDER_KEYWORD
+    )
+
+    @JvmField
+    val IMAGE_LABEL_COMPATIBLE_IDENTIFIERS = TokenSet.create(
+        RenPyScriptTokenTypes.IDENTIFIER,
+        RenPyScriptTokenTypes.IMAGE_LABEL_IDENTIFIER,
+        RenPyScriptTokenTypes.PLAIN_NUMBER
     )
 }
