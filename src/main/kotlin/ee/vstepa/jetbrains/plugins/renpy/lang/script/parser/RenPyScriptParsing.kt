@@ -2,21 +2,28 @@ package ee.vstepa.jetbrains.plugins.renpy.lang.script.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiBuilder.Marker
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.NlsContexts.ParsingError
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.tree.TokenSet
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenSets
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenTypes
 
+
+val LOG = Logger.getInstance(RenPyScriptParsing::class.java)
+
+
 open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     open fun parseScript() {
-        val scriptMarker = mark()
-        parseStatementsList()
-        advance()
-        scriptMarker.done(RenPyScriptElementTypes.REN_PY_SCRIPT)
+        mark().also {
+            parseStatementsList()
+            advance()
+            it.done(RenPyScriptElementTypes.REN_PY_SCRIPT)
+        }
     }
 
     protected open fun parseStatementsList(advance: Boolean = false): Boolean {
@@ -26,41 +33,57 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         while (!eof()) {
             val token = token()
             var success = true
-            if (token == RenPyScriptTokenTypes.INDENT) {
-                // Indents are handled by statements, if we encounter indent as statement start char during parsing statements list - indentation error
-                mark().also {
-                    advance()
-                    flushError(
-                        it,
-                        "Line is indented, but the preceding statement does not expect a block. Please check this line's indentation."
-                    )
+            when {
+                // Indents are handled by statements, if we encounter indent as statement start char during parsing
+                // statements list - indentation error
+                token == RenPyScriptTokenTypes.INDENT -> {
+                    mark().also {
+                        advance()
+                        flushError(
+                            it,
+                            "Line is indented, but the preceding statement does not expect a block. Please check this line's indentation."
+                        )
+                    }
+                    success = parseStatementsList()
                 }
-                success = parseStatementsList()
-            } else if (token == RenPyScriptTokenTypes.NEW_LINE) {
+
                 // Skipping trailing new lines
-                advance()
-            } else if (isTokenDialogueStatementStart()) {
+                token == RenPyScriptTokenTypes.NEW_LINE -> advance()
+
                 // Start of dialog statement, with character or without
-                success = parseDialogStatement()
-            } else if (isTokenBlockStatementStart()) {
-                // Start of label, menu
-                success = parseBlockStatement()
-            } else if (token == RenPyScriptTokenTypes.JUMP_KEYWORD) {
+                isTokenDialogueStatementStart(token) -> success = parseDialogStatement()
+
+                // Start of label, menu and other block statements
+                isTokenBlockStatementStart(token) -> success = parseBlockStatement()
+
                 // Start of jump ... or jump expression ...
-                success = parseJumpStatement()
-            } else if (isTokenImageDisplayControlStatementStart()) {
-                // Start of show ... or show expression ...
-                success = parseImageDisplayControlStatement()
-            } else if (token == RenPyScriptTokenTypes.DEDENT) {
+                token == RenPyScriptTokenTypes.JUMP_KEYWORD -> success = parseJumpStatement()
+
+                // Start of show, scene, hide or with statement
+                isTokenImageDisplayControlStatementStart(token) -> success = parseImageDisplayControlStatement()
+
+                // One-line python statement, e.g., $ var_1 += 2
+                token == RenPyScriptTokenTypes.ONE_LINE_PYTHON_STATEMENT -> success = parseQuickPythonStatement()
+
+                // 'pass' statement in statements list
+                token == RenPyScriptTokenTypes.PASS_KEYWORD -> success = parsePassStatement()
+
+                // 'return' statement in statements list
+                token == RenPyScriptTokenTypes.RETURN_KEYWORD -> success = parseReturnStatement()
+
                 // End of current statements list
-                advance()
-                break
-            } else {
-                mark().also {
+                token == RenPyScriptTokenTypes.DEDENT -> {
                     advance()
-                    flushError(it, "Unexpected statement start token: $token")
+                    break
                 }
-                success = false
+
+                else -> {
+                    mark().also {
+                        advance()
+                        flushError(it, "Unexpected statement start token: $token")
+                    }
+                    success = false
+                }
             }
 
             if (!success) advanceToNewLineOrEqualOrEof()
@@ -227,16 +250,15 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
     }
 
     protected open fun parseImageDisplayControlStatement(): Boolean {
-        when (val token = token()) {
-            RenPyScriptTokenTypes.SHOW_KEYWORD -> {
-                return parseShowStatement()
-            }
-            RenPyScriptTokenTypes.SCENE_KEYWORD -> {
-                return parseSceneStatement()
-            }
+        return when (val token = token()) {
+            RenPyScriptTokenTypes.SHOW_KEYWORD -> parseShowStatement()
+            RenPyScriptTokenTypes.SCENE_KEYWORD -> parseSceneStatement()
+            RenPyScriptTokenTypes.HIDE_KEYWORD -> parseHideStatement()
+            RenPyScriptTokenTypes.WITH_KEYWORD -> parseWithStatement()
+
             else -> {
                 this.builder.error("Invalid image display control statement start token: $token")
-                return true
+                return false
             }
         }
     }
@@ -496,6 +518,309 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         RenPyScriptElementTypes.SCENE_STMT_ATL,
     )
 
+    protected open fun parseWithStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.WITH_KEYWORD) {
+                error("Invalid 'with' statement start token: $it")
+                return false
+            }
+        }
+
+        var success = true
+        mark().also { stmtMarker ->
+
+            // Mark keyword token with element type
+            mark().also { keywordMarker ->
+                advance()
+                keywordMarker.done(RenPyScriptElementTypes.WITH_STMT_KEYWORD)
+            }
+
+            val token = token()
+            mark().also { valueMarker ->
+                var markerElementType: IElementType? = null
+                when {
+                    token == RenPyScriptTokenTypes.NONE -> {
+                        advance()
+                        markerElementType = RenPyScriptElementTypes.WITH_STMT_NONE_OBJ
+                    }
+                    isCurrentlyAtPythonMethodCallStart() -> {
+                        parsePythonMethodCall()
+                        markerElementType = RenPyScriptElementTypes.WITH_STMT_TRANSITION_OBJ
+                    }
+                    token == RenPyScriptTokenTypes.IDENTIFIER -> {
+                        advance()
+                        markerElementType = RenPyScriptElementTypes.WITH_STMT_TRANSITION_OBJ
+                    }
+
+                    else -> {
+                        error("'with' statement transition object or None expected")
+                    }
+                }
+
+                if (markerElementType == null) {
+                    valueMarker.drop()
+                    success = false
+                } else {
+                    valueMarker.done(markerElementType)
+                }
+            }
+
+            stmtMarker.done(RenPyScriptElementTypes.WITH_STMT)
+        }
+
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'with' statement") && success
+    }
+
+    protected open fun parseHideStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.HIDE_KEYWORD) {
+                error("Invalid 'hide' statement start token: $it")
+                return false
+            }
+        }
+
+        val stmtMarker = mark()
+
+        // Mark keyword token with element type
+        mark().also {
+            advance()
+            it.done(RenPyScriptElementTypes.HIDE_STMT_KEYWORD)
+        }
+
+        var success = true
+
+        if (isTokenImageLabelCompatibleIdentifier()) {
+            val stmtImageMarker = mark()
+            while (isTokenImageLabelCompatibleIdentifier()) {
+                mark().also {
+                    advance()
+                    it.done(RenPyScriptElementTypes.HIDE_STMT_IMAGE_PART)
+                }
+            }
+            stmtImageMarker.done(RenPyScriptElementTypes.HIDE_STMT_IMAGE)
+        } else {
+            error("'hide' statement image identifier expected")
+            success = false
+        }
+
+        if (isTokenHidePropName()) {
+            val stmtPropsListMarker = mark()
+
+            val propKeywordToken = token()
+            if (propKeywordToken == RenPyScriptTokenTypes.ONLAYER_KEYWORD) {
+                val stmtPropMarker = mark()
+
+                mark().also {
+                    advance()
+                    it.done(RenPyScriptElementTypes.HIDE_STMT_PROP_KEYWORD)
+                }
+
+                // 'hide' statement only has one keyword - onlayer, which only has one possible value - an identifier
+                mark().also {
+                    val token = token()
+                    if (token == RenPyScriptTokenTypes.IDENTIFIER) {
+                        advance()
+                        it.done(RenPyScriptElementTypes.HIDE_STMT_PROP_VALUE)
+                    } else {
+                        error("A 'name' of layer is expected as 'onlayer' property value")
+                        it.drop()
+                        success = false
+                    }
+                }
+
+                stmtPropMarker.done(RenPyScriptElementTypes.HIDE_STMT_PROP)
+            } else {
+                error("Unexpected 'hide' statement property keyword: $propKeywordToken")
+                success = false
+            }
+
+            stmtPropsListMarker.done(RenPyScriptElementTypes.HIDE_STMT_PROPS_LIST)
+        }
+
+        token().also { token ->
+            if (token == RenPyScriptTokenTypes.WITH_KEYWORD) {
+                val stmtWithClauseMarker = mark()
+
+                mark().also {
+                    advance()
+                    it.done(RenPyScriptElementTypes.HIDE_STMT_WITH_CLAUSE_KEYWORD)
+                }
+
+                mark().also {
+                    var failMessage: String? = null
+                    when {
+                        isCurrentlyAtPythonMethodCallStart() -> {
+                            if (!parsePythonMethodCall()) failMessage = "Failed to parse 'hide' statement 'with' clause value python method call"
+                        }
+                        token() == RenPyScriptTokenTypes.IDENTIFIER -> advance()
+
+                        else -> failMessage = "An 'expression' is expected as 'hide' statement 'with' clause value"
+                    }
+
+                    if (failMessage != null) {
+                        error(failMessage)
+                        it.drop()
+                        success = false
+                    } else {
+                        it.done(RenPyScriptElementTypes.HIDE_STMT_WITH_CLAUSE_VALUE)
+                    }
+                }
+
+                stmtWithClauseMarker.done(RenPyScriptElementTypes.HIDE_STMT_WITH_CLAUSE)
+            }
+        }
+
+        success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'hide' statement") && success
+
+        stmtMarker.done(RenPyScriptElementTypes.HIDE_STMT)
+        return success
+    }
+
+    protected open fun parsePassStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.PASS_KEYWORD) {
+                error("Invalid 'pass' statement start token: $it")
+                return false
+            }
+        }
+
+        mark().also { stmtMarker ->
+            mark().also { keywordMarker ->
+                advance()
+                keywordMarker.done(RenPyScriptElementTypes.PASS_STMT_KEYWORD)
+            }
+            stmtMarker.done(RenPyScriptElementTypes.PASS_STMT)
+        }
+
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'pass' statement")
+    }
+
+    protected open fun parseReturnStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.RETURN_KEYWORD) {
+                error("Invalid 'return' statement start token: $it")
+                return false
+            }
+        }
+
+        mark().also { stmtMarker ->
+            mark().also { keywordMarker ->
+                advance()
+                keywordMarker.done(RenPyScriptElementTypes.RETURN_STMT_KEYWORD)
+            }
+
+            if (!isTokenNewLineOrSimilarToIt()) {
+                // Return have optional value
+                mark().also { valueMarker ->
+                    advanceToNewLineOrEqualOrEof(error = false)
+                    valueMarker.done(RenPyScriptElementTypes.RETURN_STMT_VALUE)
+                }
+            }
+
+            stmtMarker.done(RenPyScriptElementTypes.RETURN_STMT)
+        }
+
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'return' statement")
+    }
+
+    protected open fun parseQuickPythonStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.ONE_LINE_PYTHON_STATEMENT) {
+                error("Invalid one-line python statement start token: $it")
+                return false
+            }
+        }
+
+        mark().also {
+            advance()
+            it.done(RenPyScriptElementTypes.ONE_LINE_PYTHON_STMT)
+        }
+
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the one-line python statement")
+    }
+
+    protected open fun isCurrentlyAtPythonMethodCallStart(): Boolean = token() == RenPyScriptTokenTypes.IDENTIFIER &&
+            lookAheadForTokenAfterTokenSet(
+                RenPyScriptTokenTypes.PARENTHESES_OPEN,
+                RenPyScriptTokenSets.PYTHON_METHOD_CALL_NAME_PARTS
+            )
+
+    protected open fun parsePythonMethodCall(): Boolean {
+        token().also {
+            if (!isCurrentlyAtPythonMethodCallStart()) {
+                error("Invalid python method call start token: $it")
+                return false
+            }
+        }
+
+        val pythonMethodCallMarker = mark()
+
+        mark().also {
+            while (isTokenPythonMethodCallNamePart()) {
+                advance()
+            }
+            it.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL_NAME)
+        }
+
+        val parseParenthesesResult = parsePythonMethodCallParentheses()
+
+        if (!parseParenthesesResult) {
+            error("Failed to parse python method call parentheses")
+        }
+
+        pythonMethodCallMarker.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL)
+        return parseParenthesesResult
+    }
+
+    protected open fun parsePythonMethodCallParentheses(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.PARENTHESES_OPEN) {
+                error("Invalid python method call parenthesis open token: $it")
+                return false
+            }
+        }
+
+        val parenthesesMarker = mark()
+
+        mark().also {
+            advance()
+            it.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL_PARENTHESES_OPEN)
+        }
+
+        var closeFound = false
+        var success = true
+        mark().also {
+            while (!eof()) {
+                when (token()) {
+                    RenPyScriptTokenTypes.PARENTHESES_CLOSE -> {
+                        closeFound = true
+                        break
+                    }
+
+                    RenPyScriptTokenTypes.PARENTHESES_OPEN -> {
+                        success = parsePythonMethodCallParentheses() && success
+                    }
+
+                    else -> advance()
+                }
+            }
+            it.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL_PARENTHESES_CONTENT)
+        }
+
+        if (!closeFound) {
+            error("Close parenthesis for python method call is not found")
+        } else {
+            mark().also {
+                advance()
+                it.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL_PARENTHESES_CLOSE)
+            }
+        }
+
+        parenthesesMarker.done(RenPyScriptElementTypes.PYTHON_METHOD_CALL_PARENTHESES)
+
+        return closeFound && success
+    }
+
     protected fun advance() {
         this.builder.advanceLexer()
     }
@@ -533,22 +858,27 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         }
     }
 
-    protected fun lookAheadForIndentAfterNewLines(): Boolean {
+    protected fun lookAheadForTokenAfterTokenSet(expectedToken: IElementType, acceptableTokenSet: TokenSet): Boolean {
+        if (acceptableTokenSet.contains(expectedToken)) {
+            LOG.error("Acceptable token set '$acceptableTokenSet' contains expected token '$expectedToken'. It will cause 'false' searching till EOF")
+            return false
+        }
+
         var aheadToken: IElementType? = null
         var step = 0
         while (this.builder.lookAhead(step++).also { aheadToken = it } != null) {
-            if (aheadToken == RenPyScriptTokenTypes.NEW_LINE) continue
-            if (aheadToken == RenPyScriptTokenTypes.INDENT) return true
+            if (acceptableTokenSet.contains(aheadToken)) continue
+            if (aheadToken == expectedToken) return true
             break
         }
         return false
     }
 
+    protected fun lookAheadForIndentAfterNewLines(): Boolean = lookAheadForTokenAfterTokenSet(RenPyScriptTokenTypes.INDENT, RenPyScriptTokenSets.NEW_LINES)
+
     protected fun token(): IElementType? = this.builder.tokenType
 
     protected fun tokenAhead(step: Int = 1): IElementType? = this.builder.lookAhead(step)
-
-    protected fun tokenText(): String? = this.builder.tokenText
 
     protected fun eof(): Boolean = this.builder.eof()
 
@@ -568,9 +898,13 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     protected open fun isTokenShowOrScenePropName(token: IElementType? = null): Boolean = RenPyScriptTokenSets.SHOW_OR_SCENE_PARAM_KEYWORDS.contains(token ?: token())
 
+    protected open fun isTokenHidePropName(token: IElementType? = null): Boolean = RenPyScriptTokenSets.HIDE_PARAM_KEYWORDS.contains(token ?: token())
+
     protected open fun isTokenNewLineOrSimilarToIt(token: IElementType? = null): Boolean = RenPyScriptTokenSets.NEW_LINE_OR_SIMILAR_TO_IT_TOKENS.contains(token ?: token())
 
     protected open fun isTokenImageLabelCompatibleIdentifier(token: IElementType? = null): Boolean = RenPyScriptTokenSets.IMAGE_LABEL_COMPATIBLE_IDENTIFIERS.contains(token ?: token())
+
+    protected open fun isTokenPythonMethodCallNamePart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.PYTHON_METHOD_CALL_NAME_PARTS.contains(token ?: token())
 
     protected open fun verifyTokenIsNewLineOrEqualOrEof(@ParsingError errorMessage: String): Boolean {
         if (eof() || isTokenNewLineOrSimilarToIt()) return true
@@ -579,10 +913,6 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
     }
 
     companion object {
-        fun isRenPyScriptToken(tokenType: IElementType?): Boolean {
-            return tokenType != null && tokenType is RenPyScriptTokenType
-        }
-
         fun flushError(errorMarker: Marker?, @ParsingError message: String = "Unexpected error while parsing Ren'Py Script: flushing"): Marker? {
             errorMarker?.error(message)
             return null

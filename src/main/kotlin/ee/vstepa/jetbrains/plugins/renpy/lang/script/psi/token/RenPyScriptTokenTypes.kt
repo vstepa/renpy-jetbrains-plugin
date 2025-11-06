@@ -15,6 +15,9 @@ object RenPyScriptTokenTypes {
     @JvmField val SHOW_KEYWORD = RenPyScriptTokenType("SHOW_KEYWORD")
     @JvmField val HIDE_KEYWORD = RenPyScriptTokenType("HIDE_KEYWORD")
     @JvmField val EXPRESSION_KEYWORD = RenPyScriptTokenType("EXPRESSION_KEYWORD")
+    @JvmField val PASS_KEYWORD = RenPyScriptTokenType("PASS_KEYWORD")
+    @JvmField val PLAY_KEYWORD = RenPyScriptTokenType("PLAY_KEYWORD")
+    @JvmField val RETURN_KEYWORD = RenPyScriptTokenType("RETURN_KEYWORD")
 
     // Keywords - show/scene props
     @JvmField val AS_KEYWORD = RenPyScriptTokenType("AS_KEYWORD")
@@ -28,7 +31,7 @@ object RenPyScriptTokenTypes {
     @JvmField val DEDENT = RenPyScriptTokenType("DEDENT")
 
     // Python
-    @JvmField val QUICK_PYTHON_STATEMENT = RenPyScriptTokenType("QUICK_PYTHON_STATEMENT")
+    @JvmField val ONE_LINE_PYTHON_STATEMENT = RenPyScriptTokenType("ONE_LINE_PYTHON_STATEMENT")
 
     // Others
     @JvmField val IDENTIFIER = RenPyScriptTokenType("IDENTIFIER")
@@ -39,4 +42,8 @@ object RenPyScriptTokenTypes {
     @JvmField val NEW_LINE = RenPyScriptTokenType("NEW_LINE")
     @JvmField val COMMA = RenPyScriptTokenType("COMMA")
     @JvmField val PLAIN_NUMBER = RenPyScriptTokenType("PLAIN_NUMBER")
+    @JvmField val NONE = RenPyScriptTokenType("NONE")
+    @JvmField val PARENTHESES_OPEN = RenPyScriptTokenType("PARENTHESES_OPEN")
+    @JvmField val PARENTHESES_CLOSE = RenPyScriptTokenType("PARENTHESES_CLOSE")
+    @JvmField val DOT = RenPyScriptTokenType("DOT")
 }

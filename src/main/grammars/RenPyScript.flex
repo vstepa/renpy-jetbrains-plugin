@@ -18,7 +18,7 @@ IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_]*
 IMAGE_LABEL_IDENTIFIER = [a-zA-Z0-9_][a-zA-Z0-9_-]*
 STRING = \"([^\\\"\n\r]|\\.)*\" | \'([^\\\'\n\r]|\\.)*\'
 COMMENT = \#.*
-QUICK_PYTHON_STATEMENT = \$ [^\r\n]*
+ONE_LINE_PYTHON_STATEMENT = \$ [^\r\n]*
 
 %%
 
@@ -80,13 +80,15 @@ QUICK_PYTHON_STATEMENT = \$ [^\r\n]*
 "behind" { return RenPyScriptTokenTypes.BEHIND_KEYWORD; }
 "onlayer" { return RenPyScriptTokenTypes.ONLAYER_KEYWORD; }
 "zorder" { return RenPyScriptTokenTypes.ZORDER_KEYWORD; }
-//"image"
-//"play" { return RenPyScriptTypes.PLAY_KEYWORD; }
-//"sound" { return RenPyScriptTypes.SOUND_KEYWORD; }
-//"$"    { return RenPyScriptTypes.QUICK_PYTHON_KEYWORD; }
-{QUICK_PYTHON_STATEMENT} { return RenPyScriptTokenTypes.QUICK_PYTHON_STATEMENT; }
+"pass" { return RenPyScriptTokenTypes.PASS_KEYWORD; }
+"play" { return RenPyScriptTokenTypes.PLAY_KEYWORD; }
+"return" { return RenPyScriptTokenTypes.RETURN_KEYWORD; }
+{ONE_LINE_PYTHON_STATEMENT} { return RenPyScriptTokenTypes.ONE_LINE_PYTHON_STATEMENT; }
+"None" { return RenPyScriptTokenTypes.NONE; }
 //"=" { return RenPyScriptTypes.EQ; }
-//"." { return RenPyScriptTypes.DOT; }
+"." { return RenPyScriptTokenTypes.DOT; }
+"(" { return RenPyScriptTokenTypes.PARENTHESES_OPEN; }
+")" { return RenPyScriptTokenTypes.PARENTHESES_CLOSE; }
 "," { return RenPyScriptTokenTypes.COMMA; }
 {IDENTIFIER}        { return RenPyScriptTokenTypes.IDENTIFIER; }
 {IMAGE_LABEL_IDENTIFIER} {

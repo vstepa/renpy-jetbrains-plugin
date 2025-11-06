@@ -24,13 +24,20 @@ object RenPyScriptTokenSets {
     @JvmField
     val IMAGE_DISPLAY_CONTROL_STATEMENT_STARTS = TokenSet.create(
         RenPyScriptTokenTypes.SHOW_KEYWORD,
-        RenPyScriptTokenTypes.SCENE_KEYWORD
+        RenPyScriptTokenTypes.SCENE_KEYWORD,
+        RenPyScriptTokenTypes.HIDE_KEYWORD,
+        RenPyScriptTokenTypes.WITH_KEYWORD
     )
 
     @JvmField
     val EXPRESSION_VALUES = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
         RenPyScriptTokenTypes.STRING
+    )
+
+    @JvmField
+    val NEW_LINES = TokenSet.create(
+        RenPyScriptTokenTypes.NEW_LINE
     )
 
     @JvmField
@@ -50,9 +57,25 @@ object RenPyScriptTokenSets {
     )
 
     @JvmField
+    val HIDE_PARAM_KEYWORDS = TokenSet.create(
+        RenPyScriptTokenTypes.ONLAYER_KEYWORD,
+    )
+
+    @JvmField
     val IMAGE_LABEL_COMPATIBLE_IDENTIFIERS = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
         RenPyScriptTokenTypes.IMAGE_LABEL_IDENTIFIER,
-        RenPyScriptTokenTypes.PLAIN_NUMBER
+        RenPyScriptTokenTypes.PLAIN_NUMBER,
+
+        // Apparently following keywords (their text) can be used as image label identifiers
+        RenPyScriptTokenTypes.PLAY_KEYWORD,
+        RenPyScriptTokenTypes.LABEL_KEYWORD,
+        RenPyScriptTokenTypes.PASS_KEYWORD,
+    )
+
+    @JvmField
+    val PYTHON_METHOD_CALL_NAME_PARTS = TokenSet.create(
+        RenPyScriptTokenTypes.IDENTIFIER,
+        RenPyScriptTokenTypes.DOT
     )
 }

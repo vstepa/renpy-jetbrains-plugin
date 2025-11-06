@@ -4,11 +4,9 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
 
 object RenPyScriptElementTypes {
-    @JvmField
-    val REN_PY_SCRIPT: IElementType = RenPyScriptElementType("REN_PY_SCRIPT")
+    @JvmField val REN_PY_SCRIPT: IElementType = RenPyScriptElementType("REN_PY_SCRIPT")
 
-    @JvmField
-    val FILE: IFileElementType = RenPyScriptFileElementType.INSTANCE
+    @JvmField val FILE: IFileElementType = RenPyScriptFileElementType.INSTANCE
 
     @JvmField val STMTS_LIST = RenPyScriptElementType("REN_PY_SCRIPT_STMTS_LIST")
 
@@ -72,9 +70,28 @@ object RenPyScriptElementTypes {
     @JvmField val HIDE_STMT_PROP = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_PROP")
     @JvmField val HIDE_STMT_PROP_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_PROP_KEYWORD")
     @JvmField val HIDE_STMT_PROP_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_PROP_VALUE")
+    @JvmField val HIDE_STMT_WITH_CLAUSE = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_WITH_CLAUSE")
+    @JvmField val HIDE_STMT_WITH_CLAUSE_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_WITH_CLAUSE_KEYWORD")
+    @JvmField val HIDE_STMT_WITH_CLAUSE_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_WITH_CLAUSE_VALUE")
 
     @JvmField val WITH_STMT = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT")
     @JvmField val WITH_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_KEYWORD")
     @JvmField val WITH_STMT_TRANSITION_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_TRANSITION_OBJ")
     @JvmField val WITH_STMT_NONE_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_NONE_OBJ")
+
+    @JvmField val PASS_STMT = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT")
+    @JvmField val PASS_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT_KEYWORD")
+
+    @JvmField val RETURN_STMT = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT")
+    @JvmField val RETURN_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT_KEYWORD")
+    @JvmField val RETURN_STMT_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT_VALUE")
+
+    @JvmField val ONE_LINE_PYTHON_STMT = RenPyScriptElementType("REN_PY_SCRIPT_ONE_LINE_PYTHON_STMT")
+
+    @JvmField val PYTHON_METHOD_CALL = RenPyScriptElementType("REN_PYTHON_METHOD_CALL")
+    @JvmField val PYTHON_METHOD_CALL_NAME = RenPyScriptElementType("REN_PYTHON_METHOD_CALL_NAME")
+    @JvmField val PYTHON_METHOD_CALL_PARENTHESES = RenPyScriptElementType("REN_PYTHON_METHOD_CALL_PARENTHESES")
+    @JvmField val PYTHON_METHOD_CALL_PARENTHESES_OPEN = RenPyScriptElementType("REN_PYTHON_METHOD_CALL_PARENTHESES_OPEN")
+    @JvmField val PYTHON_METHOD_CALL_PARENTHESES_CLOSE = RenPyScriptElementType("REN_PYTHON_METHOD_CALL_PARENTHESES_CLOSE")
+    @JvmField val PYTHON_METHOD_CALL_PARENTHESES_CONTENT = RenPyScriptElementType("REN_PYTHON_METHOD_CALL_PARENTHESES_CLOSE")
 }
