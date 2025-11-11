@@ -8,6 +8,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.audio.RenPyScriptAudioControlStmtElementType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenSets
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenType
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenTypes
@@ -70,6 +71,12 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
                 // 'return' statement in statements list
                 token == RenPyScriptTokenTypes.RETURN_KEYWORD -> success = parseReturnStatement()
+
+                // 'play', 'stop' or 'queue' statements
+                isTokenAudioControlStatementStart(token) -> success = parseAudioControlStatement()
+
+                // 'pause' statement
+                token == RenPyScriptTokenTypes.PAUSE_KEYWORD -> success = parsePauseStatement()
 
                 // End of current statements list
                 token == RenPyScriptTokenTypes.DEDENT -> {
@@ -172,24 +179,26 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
                 advance()
                 dialogStatementIdentifierMarker.done(RenPyScriptElementTypes.DIALOG_STMT_IDENTIFIER)
             }
-            RenPyScriptTokenTypes.STRING if (tokenAhead() == RenPyScriptTokenTypes.STRING) -> {
+            RenPyScriptTokenTypes.STRING if (isTokenDialogueStatementTextStart(tokenAhead())) -> {
                 // Our token text identifier is also a text line
                 // Dialog line looks like this: "John" "Hello, my name is John!"
-                val dialogStatementTextIdentifierMarker = mark()
-                advance()
-                dialogStatementTextIdentifierMarker.done(RenPyScriptElementTypes.DIALOG_STMT_TEXT_IDENTIFIER)
+                mark().also {
+                    advance()
+                    it.done(RenPyScriptElementTypes.DIALOG_STMT_TEXT_IDENTIFIER)
+                }
             }
         }
 
         var success = true
-        val dialogStatementTextMarker = mark()
-        if (token() == RenPyScriptTokenTypes.STRING) {
-            advance()
-            dialogStatementTextMarker.done(RenPyScriptElementTypes.DIALOG_STMT_TEXT)
-        } else {
-            error("Dialog statement text expected")
-            dialogStatementTextMarker.drop()
-            success = false
+        mark().also {
+            if (isTokenDialogueStatementTextStart()) {
+                advance()
+                it.done(RenPyScriptElementTypes.DIALOG_STMT_TEXT)
+            } else {
+                error("Dialog statement text expected")
+                it.drop()
+                success = false
+            }
         }
 
         success = verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the dialog statement") && success
@@ -440,13 +449,22 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             }
 
             mark().also {
-                if (token() == RenPyScriptTokenTypes.IDENTIFIER) {
-                    advance()
-                    it.done(stmtWithClauseValueElementType)
-                } else {
-                    error("An 'expression' is expected as '$stmtName' statement 'with' clause value")
+                var failMessage: String? = null
+                when {
+                    isCurrentlyAtPythonMethodCallStart() -> {
+                        if (!parsePythonMethodCall()) failMessage = "Failed to parse '$stmtName' statement 'with' clause value python method call"
+                    }
+                    token() == RenPyScriptTokenTypes.IDENTIFIER -> advance()
+
+                    else -> failMessage = "An 'expression' is expected as '$stmtName' statement 'with' clause value"
+                }
+
+                if (failMessage != null) {
+                    error(failMessage)
                     it.drop()
                     success = false
+                } else {
+                    it.done(stmtWithClauseValueElementType)
                 }
             }
 
@@ -709,7 +727,7 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
                 keywordMarker.done(RenPyScriptElementTypes.RETURN_STMT_KEYWORD)
             }
 
-            if (!isTokenNewLineOrSimilarToIt()) {
+            if (!eof() && !isTokenNewLineOrSimilarToIt()) {
                 // Return have optional value
                 mark().also { valueMarker ->
                     advanceToNewLineOrEqualOrEof(error = false)
@@ -718,6 +736,204 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
             }
 
             stmtMarker.done(RenPyScriptElementTypes.RETURN_STMT)
+        }
+
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'return' statement")
+    }
+
+    protected open fun parseAudioControlStatement(): Boolean {
+        val stmtKeywordToken = token()
+
+        val stmtElementType: RenPyScriptAudioControlStmtElementType
+        when (stmtKeywordToken) {
+            RenPyScriptTokenTypes.PLAY_KEYWORD -> {
+                stmtElementType = RenPyScriptElementTypes.PLAY_STMT
+            }
+            RenPyScriptTokenTypes.STOP_KEYWORD -> {
+                stmtElementType = RenPyScriptElementTypes.STOP_STMT
+            }
+            RenPyScriptTokenTypes.QUEUE_KEYWORD -> {
+                stmtElementType = RenPyScriptElementTypes.QUEUE_STMT
+            }
+
+            else -> {
+                this.builder.error("Invalid audio control statement keyword token: $stmtKeywordToken")
+                return false
+            }
+        }
+
+        val stmtMarker = mark()
+
+        // Mark keyword token with element type
+        markAndDoneGeneralKeyword()
+
+        var success = true
+
+        // Channel
+        if (token() == RenPyScriptTokenTypes.IDENTIFIER) {
+            markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CHANNEL)
+        } else {
+            error("'${stmtElementType.stmtName}' statement channel expected")
+            success = false
+        }
+
+        if (stmtElementType.hasAudio) {
+            mark().also {
+                var localSuccess = true
+                when (token()) {
+                    RenPyScriptTokenTypes.SQUARE_BRACKETS_OPEN ->
+                        success = parseAudioControlStatementAudioList(stmtElementType.stmtName) && success
+
+                    RenPyScriptTokenTypes.IDENTIFIER, RenPyScriptTokenTypes.STRING ->
+                        success = parseAudioControlStatementAudioFile(stmtElementType.stmtName) && success
+
+                    else -> {
+                        it.drop()
+                        error("'${stmtElementType.stmtName}' audio file(s) expected")
+                        success = false
+                        localSuccess = false
+                    }
+                }
+
+                if (localSuccess) it.done(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO)
+            }
+        }
+
+        if (token() == RenPyScriptTokenTypes.IDENTIFIER) {
+            mark().also { stmtClausesListMarker ->
+                while (!eof()) {
+                    if (token() != RenPyScriptTokenTypes.IDENTIFIER) break
+                    mark().also { stmtClauseMarker ->
+                        val clauseKeywordText = tokenText()
+                        if (stmtElementType.clausesKeywords.contains(clauseKeywordText)) {
+                            markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE_KEYWORD)
+
+                            if (RenPyScriptAudioControlStmtElementType.CLAUSES_WITH_VALUES.contains(clauseKeywordText)) {
+                                if (isTokenAudioControlStatementClauseValue()) {
+                                    markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE_VALUE)
+                                } else {
+                                    error("'${stmtElementType.stmtName}' clause '$clauseKeywordText' expects value")
+                                    success = false
+                                }
+                            }
+                        } else {
+                            if (RenPyScriptAudioControlStmtElementType.ALL_CLAUSES.contains(clauseKeywordText)) {
+                                markAdvanceError("Clause '$clauseKeywordText' is not expected in audio control statement '${stmtElementType.stmtName}'")
+                            } else {
+                                markAdvanceError("Incorrect clause keyword '$clauseKeywordText'. Expected one of the following: ${stmtElementType.clausesKeywords}")
+                            }
+                            success = false
+                        }
+                        stmtClauseMarker.done(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE)
+                    }
+                }
+                stmtClausesListMarker.done(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSES_LIST)
+            }
+        }
+
+        stmtMarker.done(stmtElementType)
+        return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the '${stmtElementType.stmtName}' audio control statement") && success
+    }
+
+    protected open fun parseAudioControlStatementAudioFile(stmtName: String): Boolean {
+        val token = token()
+        if (token == RenPyScriptTokenTypes.IDENTIFIER || token == RenPyScriptTokenTypes.STRING) {
+            markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_FILE)
+            return true
+        }
+
+        error("Invalid '$stmtName' statement audio file identifier token: $token")
+        return false
+    }
+
+    protected open fun parseAudioControlStatementAudioList(stmtName: String): Boolean {
+        if (token() != RenPyScriptTokenTypes.SQUARE_BRACKETS_OPEN) {
+            error("Invalid '$stmtName' statement audio list start token (expected: '['): ${token()}")
+            return false
+        }
+
+        val listMarker = mark()
+
+        markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_OPEN)
+
+        var success = true
+
+        mark().also { marker ->
+            var started = false
+            var foundEndBracket = false
+            outer@ while (!eof()) {
+                started = true
+
+                if (isTokenNewLineOrSimilarToIt()) {
+                    advance()
+                    continue
+                }
+
+                success = parseAudioControlStatementAudioFile(stmtName) && success
+
+                while (true) {
+                    when (val token = token()) {
+                        RenPyScriptTokenTypes.SQUARE_BRACKETS_CLOSE -> {
+                            foundEndBracket = true
+                            break@outer
+                        }
+                        RenPyScriptTokenTypes.COMMA -> {
+                            advance()
+                            break
+                        }
+                        else -> {
+                            if (isTokenNewLineOrSimilarToIt(token)) {
+                                break
+                            }
+                            markAdvanceError("Unexpected token inside '$stmtName' audio control statement audio list: $token")
+                            success = false
+                        }
+                    }
+                }
+            }
+            marker.done(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_FILES)
+            success = started && foundEndBracket && success
+        }
+
+        if (token() == RenPyScriptTokenTypes.SQUARE_BRACKETS_CLOSE) {
+            markAdvanceDone(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_CLOSE)
+        } else {
+            error("Invalid '$stmtName' statement audio list end token (expected: ']'): ${token()}")
+            success = false
+        }
+
+        listMarker.done(RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST)
+        return success
+    }
+
+    protected open fun parsePauseStatement(): Boolean {
+        token().also {
+            if (it != RenPyScriptTokenTypes.PAUSE_KEYWORD) {
+                error("Invalid 'pause' statement start token: $it")
+                return false
+            }
+        }
+
+        mark().also { stmtMarker ->
+            mark().also { keywordMarker ->
+                advance()
+                keywordMarker.done(RenPyScriptElementTypes.GEN_STMT_KEYWORD)
+            }
+
+            if (!eof() && !isTokenNewLineOrSimilarToIt()) {
+                // Pause have optional number value
+                mark().also { valueMarker ->
+                    val token = token()
+                    advance()
+                    if (isTokenNumber(token) || token == RenPyScriptTokenTypes.IDENTIFIER) {
+                        valueMarker.done(RenPyScriptElementTypes.GEN_STMT_VALUE)
+                    } else {
+                        valueMarker.error("Invalid 'pause' statement value")
+                    }
+                }
+            }
+
+            stmtMarker.done(RenPyScriptElementTypes.PAUSE_STMT)
         }
 
         return verifyTokenIsNewLineOrEqualOrEof("New line is expected at the end of the 'return' statement")
@@ -878,6 +1094,8 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
 
     protected fun token(): IElementType? = this.builder.tokenType
 
+    protected fun tokenText(): String? = this.builder.tokenText
+
     protected fun tokenAhead(step: Int = 1): IElementType? = this.builder.lookAhead(step)
 
     protected fun eof(): Boolean = this.builder.eof()
@@ -888,13 +1106,37 @@ open class RenPyScriptParsing(private val builder: PsiBuilder) {
         this.builder.error(message)
     }
 
+    protected open fun markAdvanceDone(elementType: IElementType) {
+        mark().also {
+            advance()
+            it.done(elementType)
+        }
+    }
+
+    protected open fun markAdvanceError(message: String) {
+        mark().also {
+            advance()
+            it.error(message)
+        }
+    }
+
+    protected open fun markAndDoneGeneralKeyword() = markAdvanceDone(RenPyScriptElementTypes.GEN_STMT_KEYWORD)
+
     protected open fun isTokenBlockStatementStart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.BLOCK_STATEMENT_STARTS.contains(token ?: token())
 
     protected open fun isTokenDialogueStatementStart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.DIALOGUE_STATEMENT_STARTS.contains(token ?: token())
 
+    protected open fun isTokenDialogueStatementTextStart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.DIALOGUE_STATEMENT_TEXTS.contains(token ?: token())
+
     protected open fun isTokenExpressionValue(token: IElementType? = null): Boolean = RenPyScriptTokenSets.EXPRESSION_VALUES.contains(token ?: token())
 
     protected open fun isTokenImageDisplayControlStatementStart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.IMAGE_DISPLAY_CONTROL_STATEMENT_STARTS.contains(token ?: token())
+
+    protected open fun isTokenAudioControlStatementStart(token: IElementType? = null): Boolean = RenPyScriptTokenSets.AUDIO_CONTROL_STATEMENT_STARTS.contains(token ?: token())
+
+    protected open fun isTokenAudioControlStatementClauseValue(token: IElementType? = null): Boolean = RenPyScriptTokenSets.AUDIO_CONTROL_STATEMENT_CLAUSE_VALUES.contains(token ?: token())
+
+    protected open fun isTokenNumber(token: IElementType? = null): Boolean = RenPyScriptTokenSets.NUMBERS.contains(token ?: token())
 
     protected open fun isTokenShowOrScenePropName(token: IElementType? = null): Boolean = RenPyScriptTokenSets.SHOW_OR_SCENE_PARAM_KEYWORDS.contains(token ?: token())
 

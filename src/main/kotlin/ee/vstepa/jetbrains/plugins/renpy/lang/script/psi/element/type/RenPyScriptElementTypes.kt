@@ -2,12 +2,18 @@ package ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type
 
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.audio.RenPyScriptPlayStmtElementType
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.audio.RenPyScriptQueueStmtElementType
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.audio.RenPyScriptStopStmtElementType
 
 object RenPyScriptElementTypes {
     @JvmField val REN_PY_SCRIPT: IElementType = RenPyScriptElementType("REN_PY_SCRIPT")
 
     @JvmField val FILE: IFileElementType = RenPyScriptFileElementType.INSTANCE
 
+    // Generals
+    @JvmField val GEN_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_GEN_STMT_KEYWORD")
+    @JvmField val GEN_STMT_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_GEN_STMT_VALUE")
     @JvmField val STMTS_LIST = RenPyScriptElementType("REN_PY_SCRIPT_STMTS_LIST")
 
     @JvmField val LABEL = RenPyScriptElementType("REN_PY_SCRIPT_LABEL")
@@ -78,6 +84,27 @@ object RenPyScriptElementTypes {
     @JvmField val WITH_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_KEYWORD")
     @JvmField val WITH_STMT_TRANSITION_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_TRANSITION_OBJ")
     @JvmField val WITH_STMT_NONE_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_NONE_OBJ")
+
+
+    // Audio control statements element types
+    @JvmField val PLAY_STMT = RenPyScriptPlayStmtElementType()
+    @JvmField val QUEUE_STMT = RenPyScriptQueueStmtElementType()
+    @JvmField val STOP_STMT = RenPyScriptStopStmtElementType()
+
+    @JvmField val AUDIO_CONTROL_STMT_CHANNEL = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_CHANNEL")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO_FILE = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO_FILE")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO_LIST = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO_LIST")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO_LIST_OPEN = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO_LIST_OPEN")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO_LIST_CLOSE = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO_LIST_CLOSE")
+    @JvmField val AUDIO_CONTROL_STMT_AUDIO_LIST_FILES = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_AUDIO_LIST_FILES")
+    @JvmField val AUDIO_CONTROL_STMT_CLAUSES_LIST = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_CLAUSES_LIST")
+    @JvmField val AUDIO_CONTROL_STMT_CLAUSE = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_CLAUSE")
+    @JvmField val AUDIO_CONTROL_STMT_CLAUSE_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_CLAUSE_KEYWORD")
+    @JvmField val AUDIO_CONTROL_STMT_CLAUSE_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_AUDIO_CONTROL_STMT_CLAUSE_VALUE")
+
+
+    @JvmField val PAUSE_STMT = RenPyScriptElementType("REN_PY_SCRIPT_PAUSE_STMT")
 
     @JvmField val PASS_STMT = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT")
     @JvmField val PASS_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT_KEYWORD")

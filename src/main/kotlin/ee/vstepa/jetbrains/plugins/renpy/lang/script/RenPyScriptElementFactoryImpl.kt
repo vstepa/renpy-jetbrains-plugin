@@ -5,13 +5,13 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.UnsupportedNodeElementTypeException
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.RenPyScriptFile
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.audio.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtIdentifierImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtTextIdentifierImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.RenPyScriptDialogStmtTextImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.hide.impl.*
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.RenPyScriptImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.RenPyScriptStmtsListImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.jump.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.pass.impl.RenPyScriptPassStmtImpl
@@ -37,6 +37,8 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
         return when(elementType) {
             RenPyScriptElementTypes.REN_PY_SCRIPT -> RenPyScriptImpl(node)
 
+            RenPyScriptElementTypes.GEN_STMT_KEYWORD -> RenPyScriptGenStmtKeywordImpl(node)
+            RenPyScriptElementTypes.GEN_STMT_VALUE -> RenPyScriptGenStmtValueImpl(node)
             RenPyScriptElementTypes.STMTS_LIST -> RenPyScriptStmtsListImpl(node)
 
             RenPyScriptElementTypes.LABEL -> RenPyScriptLabelImpl(node)
@@ -107,6 +109,24 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.WITH_STMT_KEYWORD -> RenPyScriptWithStmtKeywordImpl(node)
             RenPyScriptElementTypes.WITH_STMT_TRANSITION_OBJ -> RenPyScriptWithStmtTransitionObjImpl(node)
             RenPyScriptElementTypes.WITH_STMT_NONE_OBJ -> RenPyScriptWithStmtNoneObjImpl(node)
+
+            RenPyScriptElementTypes.PLAY_STMT -> RenPyScriptPlayStmtImpl(node)
+            RenPyScriptElementTypes.QUEUE_STMT -> RenPyScriptQueueStmtImpl(node)
+            RenPyScriptElementTypes.STOP_STMT -> RenPyScriptStopStmtImpl(node)
+
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CHANNEL -> RenPyScriptAudioControlStmtChannelImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO -> RenPyScriptAudioControlStmtAudioImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_FILE -> RenPyScriptAudioControlStmtAudioFileImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST -> RenPyScriptAudioControlStmtAudioListImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_OPEN -> RenPyScriptAudioControlStmtAudioListOpenImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_CLOSE -> RenPyScriptAudioControlStmtAudioListCloseImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_AUDIO_LIST_FILES -> RenPyScriptAudioControlStmtAudioListFilesImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSES_LIST -> RenPyScriptAudioControlStmtClausesListImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE -> RenPyScriptAudioControlStmtClauseImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE_KEYWORD -> RenPyScriptAudioControlStmtClauseKeywordImpl(node)
+            RenPyScriptElementTypes.AUDIO_CONTROL_STMT_CLAUSE_VALUE -> RenPyScriptAudioControlStmtClauseValueImpl(node)
+
+            RenPyScriptElementTypes.PAUSE_STMT -> RenPyScriptPauseStmtImpl(node)
 
             RenPyScriptElementTypes.PASS_STMT -> RenPyScriptPassStmtImpl(node)
             RenPyScriptElementTypes.PASS_STMT_KEYWORD -> RenPyScriptPassStmtKeywordImpl(node)

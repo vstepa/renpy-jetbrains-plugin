@@ -16,7 +16,10 @@ object RenPyScriptTokenTypes {
     @JvmField val HIDE_KEYWORD = RenPyScriptTokenType("HIDE_KEYWORD")
     @JvmField val EXPRESSION_KEYWORD = RenPyScriptTokenType("EXPRESSION_KEYWORD")
     @JvmField val PASS_KEYWORD = RenPyScriptTokenType("PASS_KEYWORD")
+    @JvmField val PAUSE_KEYWORD = RenPyScriptTokenType("PAUSE_KEYWORD")
     @JvmField val PLAY_KEYWORD = RenPyScriptTokenType("PLAY_KEYWORD")
+    @JvmField val STOP_KEYWORD = RenPyScriptTokenType("STOP_KEYWORD")
+    @JvmField val QUEUE_KEYWORD = RenPyScriptTokenType("QUEUE_KEYWORD")
     @JvmField val RETURN_KEYWORD = RenPyScriptTokenType("RETURN_KEYWORD")
 
     // Keywords - show/scene props
@@ -37,13 +40,17 @@ object RenPyScriptTokenTypes {
     @JvmField val IDENTIFIER = RenPyScriptTokenType("IDENTIFIER")
     @JvmField val IMAGE_LABEL_IDENTIFIER = RenPyScriptTokenType("IMAGE_LABEL_IDENTIFIER")
     @JvmField val STRING = RenPyScriptTokenType("STRING")
+    @JvmField val MULTILINE_DIALOG_STRING = RenPyScriptTokenType("MULTILINE_DIALOG_STRING")
     @JvmField val COMMENT = RenPyScriptTokenType("COMMENT")
     @JvmField val COLON = RenPyScriptTokenType("COLON")
     @JvmField val NEW_LINE = RenPyScriptTokenType("NEW_LINE")
     @JvmField val COMMA = RenPyScriptTokenType("COMMA")
     @JvmField val PLAIN_NUMBER = RenPyScriptTokenType("PLAIN_NUMBER")
+    @JvmField val FLOAT_NUMBER = RenPyScriptTokenType("FLOAT_NUMBER")
     @JvmField val NONE = RenPyScriptTokenType("NONE")
     @JvmField val PARENTHESES_OPEN = RenPyScriptTokenType("PARENTHESES_OPEN")
     @JvmField val PARENTHESES_CLOSE = RenPyScriptTokenType("PARENTHESES_CLOSE")
+    @JvmField val SQUARE_BRACKETS_OPEN = RenPyScriptTokenType("SQUARE_BRACKETS_OPEN")
+    @JvmField val SQUARE_BRACKETS_CLOSE = RenPyScriptTokenType("SQUARE_BRACKETS_CLOSE")
     @JvmField val DOT = RenPyScriptTokenType("DOT")
 }

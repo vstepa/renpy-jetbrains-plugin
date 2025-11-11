@@ -18,7 +18,14 @@ object RenPyScriptTokenSets {
     @JvmField
     val DIALOGUE_STATEMENT_STARTS = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
-        RenPyScriptTokenTypes.STRING
+        RenPyScriptTokenTypes.STRING,
+        RenPyScriptTokenTypes.MULTILINE_DIALOG_STRING,
+    )
+
+    @JvmField
+    val DIALOGUE_STATEMENT_TEXTS = TokenSet.create(
+        RenPyScriptTokenTypes.STRING,
+        RenPyScriptTokenTypes.MULTILINE_DIALOG_STRING,
     )
 
     @JvmField
@@ -27,6 +34,13 @@ object RenPyScriptTokenSets {
         RenPyScriptTokenTypes.SCENE_KEYWORD,
         RenPyScriptTokenTypes.HIDE_KEYWORD,
         RenPyScriptTokenTypes.WITH_KEYWORD
+    )
+
+    @JvmField
+    val AUDIO_CONTROL_STATEMENT_STARTS = TokenSet.create(
+        RenPyScriptTokenTypes.PLAY_KEYWORD,
+        RenPyScriptTokenTypes.STOP_KEYWORD,
+        RenPyScriptTokenTypes.QUEUE_KEYWORD,
     )
 
     @JvmField
@@ -69,6 +83,8 @@ object RenPyScriptTokenSets {
 
         // Apparently following keywords (their text) can be used as image label identifiers
         RenPyScriptTokenTypes.PLAY_KEYWORD,
+        RenPyScriptTokenTypes.STOP_KEYWORD,
+        RenPyScriptTokenTypes.QUEUE_KEYWORD,
         RenPyScriptTokenTypes.LABEL_KEYWORD,
         RenPyScriptTokenTypes.PASS_KEYWORD,
     )
@@ -77,5 +93,19 @@ object RenPyScriptTokenSets {
     val PYTHON_METHOD_CALL_NAME_PARTS = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
         RenPyScriptTokenTypes.DOT
+    )
+
+    @JvmField
+    val NUMBERS = TokenSet.create(
+        RenPyScriptTokenTypes.PLAIN_NUMBER,
+        RenPyScriptTokenTypes.FLOAT_NUMBER,
+    )
+
+    @JvmField
+    val AUDIO_CONTROL_STATEMENT_CLAUSE_VALUES = TokenSet.create(
+        RenPyScriptTokenTypes.PLAIN_NUMBER,
+        RenPyScriptTokenTypes.FLOAT_NUMBER,
+        RenPyScriptTokenTypes.STRING,
+        RenPyScriptTokenTypes.IDENTIFIER,
     )
 }
