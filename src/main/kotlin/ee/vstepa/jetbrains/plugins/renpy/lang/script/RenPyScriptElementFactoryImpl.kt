@@ -13,20 +13,14 @@ import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.dialog.impl.Ren
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.hide.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.jump.impl.*
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.*
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.pass.impl.RenPyScriptPassStmtImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.pass.impl.RenPyScriptPassStmtKeywordImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.RenPyScriptLabelImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.RenPyScriptLabelStmtColonImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.RenPyScriptLabelStmtImpl
+import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.label.impl.RenPyScriptLabelStmtNameImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.python.impl.*
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.ret.impl.RenPyScriptReturnStmtImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.ret.impl.RenPyScriptReturnStmtKeywordImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.ret.impl.RenPyScriptReturnStmtValueImpl
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.scene.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.show.impl.*
 import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.with.impl.RenPyScriptWithStmtImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.with.impl.RenPyScriptWithStmtKeywordImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.with.impl.RenPyScriptWithStmtNoneObjImpl
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.with.impl.RenPyScriptWithStmtTransitionObjImpl
 
 class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
     override fun createFile(viewProvider: FileViewProvider): RenPyScriptFile = RenPyScriptFile(viewProvider)
@@ -44,7 +38,6 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.LABEL -> RenPyScriptLabelImpl(node)
             RenPyScriptElementTypes.LABEL_STMT -> RenPyScriptLabelStmtImpl(node)
             RenPyScriptElementTypes.LABEL_STMT_COLON -> RenPyScriptLabelStmtColonImpl(node)
-            RenPyScriptElementTypes.LABEL_STMT_KEYWORD -> RenPyScriptLabelStmtKeywordImpl(node)
             RenPyScriptElementTypes.LABEL_STMT_NAME -> RenPyScriptLabelStmtNameImpl(node)
 
             RenPyScriptElementTypes.DIALOG_STMT -> RenPyScriptDialogStmtImpl(node)
@@ -53,14 +46,12 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.DIALOG_STMT_TEXT_IDENTIFIER -> RenPyScriptDialogStmtTextIdentifierImpl(node)
 
             RenPyScriptElementTypes.JUMP_STMT -> RenPyScriptJumpStmtImpl(node)
-            RenPyScriptElementTypes.JUMP_STMT_KEYWORD -> RenPyScriptJumpStmtKeywordImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_TARGET -> RenPyScriptJumpStmtTargetImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION -> RenPyScriptJumpStmtExpressionImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_KEYWORD -> RenPyScriptJumpStmtExpressionKeywordImpl(node)
             RenPyScriptElementTypes.JUMP_STMT_EXPRESSION_VALUE -> RenPyScriptJumpStmtExpressionValueImpl(node)
 
             RenPyScriptElementTypes.SCENE_STMT -> RenPyScriptSceneStmtImpl(node)
-            RenPyScriptElementTypes.SCENE_STMT_KEYWORD -> RenPyScriptSceneStmtKeywordImpl(node)
             RenPyScriptElementTypes.SCENE_STMT_IMAGE -> RenPyScriptSceneStmtImageImpl(node)
             RenPyScriptElementTypes.SCENE_STMT_IMAGE_PART -> RenPyScriptSceneStmtImagePartImpl(node)
             RenPyScriptElementTypes.SCENE_STMT_EXPRESSION -> RenPyScriptSceneStmtExpressionImpl(node)
@@ -77,7 +68,6 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.SCENE_STMT_ATL -> RenPyScriptSceneStmtATLImpl(node)
 
             RenPyScriptElementTypes.SHOW_STMT -> RenPyScriptShowStmtImpl(node)
-            RenPyScriptElementTypes.SHOW_STMT_KEYWORD -> RenPyScriptShowStmtKeywordImpl(node)
             RenPyScriptElementTypes.SHOW_STMT_IMAGE -> RenPyScriptShowStmtImageImpl(node)
             RenPyScriptElementTypes.SHOW_STMT_IMAGE_PART -> RenPyScriptShowStmtImagePartImpl(node)
             RenPyScriptElementTypes.SHOW_STMT_EXPRESSION -> RenPyScriptShowStmtExpressionImpl(node)
@@ -94,7 +84,6 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.SHOW_STMT_ATL -> RenPyScriptShowStmtATLImpl(node)
 
             RenPyScriptElementTypes.HIDE_STMT -> RenPyScriptHideStmtImpl(node)
-            RenPyScriptElementTypes.HIDE_STMT_KEYWORD -> RenPyScriptHideStmtKeywordImpl(node)
             RenPyScriptElementTypes.HIDE_STMT_IMAGE -> RenPyScriptHideStmtImageImpl(node)
             RenPyScriptElementTypes.HIDE_STMT_IMAGE_PART -> RenPyScriptHideStmtImagePartImpl(node)
             RenPyScriptElementTypes.HIDE_STMT_PROPS_LIST -> RenPyScriptHideStmtPropsListImpl(node)
@@ -106,9 +95,6 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.HIDE_STMT_WITH_CLAUSE_VALUE -> RenPyScriptHideStmtWithClauseValueImpl(node)
 
             RenPyScriptElementTypes.WITH_STMT -> RenPyScriptWithStmtImpl(node)
-            RenPyScriptElementTypes.WITH_STMT_KEYWORD -> RenPyScriptWithStmtKeywordImpl(node)
-            RenPyScriptElementTypes.WITH_STMT_TRANSITION_OBJ -> RenPyScriptWithStmtTransitionObjImpl(node)
-            RenPyScriptElementTypes.WITH_STMT_NONE_OBJ -> RenPyScriptWithStmtNoneObjImpl(node)
 
             RenPyScriptElementTypes.PLAY_STMT -> RenPyScriptPlayStmtImpl(node)
             RenPyScriptElementTypes.QUEUE_STMT -> RenPyScriptQueueStmtImpl(node)
@@ -129,11 +115,8 @@ class RenPyScriptElementFactoryImpl : RenPyScriptElementFactory {
             RenPyScriptElementTypes.PAUSE_STMT -> RenPyScriptPauseStmtImpl(node)
 
             RenPyScriptElementTypes.PASS_STMT -> RenPyScriptPassStmtImpl(node)
-            RenPyScriptElementTypes.PASS_STMT_KEYWORD -> RenPyScriptPassStmtKeywordImpl(node)
 
             RenPyScriptElementTypes.RETURN_STMT -> RenPyScriptReturnStmtImpl(node)
-            RenPyScriptElementTypes.RETURN_STMT_KEYWORD -> RenPyScriptReturnStmtKeywordImpl(node)
-            RenPyScriptElementTypes.RETURN_STMT_VALUE -> RenPyScriptReturnStmtValueImpl(node)
 
             RenPyScriptElementTypes.ONE_LINE_PYTHON_STMT -> RenPyScriptOneLinePythonStmtImpl(node)
 

@@ -1,4 +1,4 @@
-package ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.with
+package ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element
 
 import com.intellij.psi.PsiElement
 

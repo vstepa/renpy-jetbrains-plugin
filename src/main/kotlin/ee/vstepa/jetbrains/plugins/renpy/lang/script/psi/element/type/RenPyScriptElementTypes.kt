@@ -19,7 +19,6 @@ object RenPyScriptElementTypes {
     @JvmField val LABEL = RenPyScriptElementType("REN_PY_SCRIPT_LABEL")
     @JvmField val LABEL_STMT = RenPyScriptElementType("REN_PY_SCRIPT_LABEL_STMT")
     @JvmField val LABEL_STMT_COLON = RenPyScriptElementType("REN_PY_SCRIPT_LABEL_STMT_COLON")
-    @JvmField val LABEL_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_LABEL_STMT_KEYWORD")
     @JvmField val LABEL_STMT_NAME = RenPyScriptElementType("REN_PY_SCRIPT_LABEL_STMT_NAME")
 
     @JvmField val DIALOG_STMT = RenPyScriptElementType("REN_PY_SCRIPT_DIALOG_STMT")
@@ -28,14 +27,12 @@ object RenPyScriptElementTypes {
     @JvmField val DIALOG_STMT_TEXT = RenPyScriptElementType("REN_PY_SCRIPT_DIALOG_STMT_TEXT")
 
     @JvmField val JUMP_STMT = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT")
-    @JvmField val JUMP_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT_KEYWORD")
     @JvmField val JUMP_STMT_TARGET = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT_TARGET")
     @JvmField val JUMP_STMT_EXPRESSION = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT_EXPRESSION")
     @JvmField val JUMP_STMT_EXPRESSION_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT_EXPRESSION_KEYWORD")
     @JvmField val JUMP_STMT_EXPRESSION_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_JUMP_STMT_EXPRESSION_VALUE")
 
     @JvmField val SCENE_STMT = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT")
-    @JvmField val SCENE_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT_KEYWORD")
     @JvmField val SCENE_STMT_IMAGE = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT_IMAGE")
     @JvmField val SCENE_STMT_IMAGE_PART = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT_IMAGE_PART")
     @JvmField val SCENE_STMT_EXPRESSION = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT_EXPRESSION")
@@ -52,7 +49,6 @@ object RenPyScriptElementTypes {
     @JvmField val SCENE_STMT_ATL = RenPyScriptElementType("REN_PY_SCRIPT_SCENE_STMT_ATL")
 
     @JvmField val SHOW_STMT = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT")
-    @JvmField val SHOW_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT_KEYWORD")
     @JvmField val SHOW_STMT_IMAGE = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT_IMAGE")
     @JvmField val SHOW_STMT_IMAGE_PART = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT_IMAGE_PART")
     @JvmField val SHOW_STMT_EXPRESSION = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT_EXPRESSION")
@@ -69,7 +65,6 @@ object RenPyScriptElementTypes {
     @JvmField val SHOW_STMT_ATL = RenPyScriptElementType("REN_PY_SCRIPT_SHOW_STMT_ATL")
 
     @JvmField val HIDE_STMT = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT")
-    @JvmField val HIDE_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_KEYWORD")
     @JvmField val HIDE_STMT_IMAGE = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_IMAGE")
     @JvmField val HIDE_STMT_IMAGE_PART = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_IMAGE_PART")
     @JvmField val HIDE_STMT_PROPS_LIST = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_PROPS_LIST")
@@ -81,9 +76,6 @@ object RenPyScriptElementTypes {
     @JvmField val HIDE_STMT_WITH_CLAUSE_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_HIDE_STMT_WITH_CLAUSE_VALUE")
 
     @JvmField val WITH_STMT = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT")
-    @JvmField val WITH_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_KEYWORD")
-    @JvmField val WITH_STMT_TRANSITION_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_TRANSITION_OBJ")
-    @JvmField val WITH_STMT_NONE_OBJ = RenPyScriptElementType("REN_PY_SCRIPT_WITH_STMT_NONE_OBJ")
 
 
     // Audio control statements element types
@@ -107,11 +99,8 @@ object RenPyScriptElementTypes {
     @JvmField val PAUSE_STMT = RenPyScriptElementType("REN_PY_SCRIPT_PAUSE_STMT")
 
     @JvmField val PASS_STMT = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT")
-    @JvmField val PASS_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_PASS_STMT_KEYWORD")
 
     @JvmField val RETURN_STMT = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT")
-    @JvmField val RETURN_STMT_KEYWORD = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT_KEYWORD")
-    @JvmField val RETURN_STMT_VALUE = RenPyScriptElementType("REN_PY_SCRIPT_RETURN_STMT_VALUE")
 
     @JvmField val ONE_LINE_PYTHON_STMT = RenPyScriptElementType("REN_PY_SCRIPT_ONE_LINE_PYTHON_STMT")
 
