@@ -1,7 +1,0 @@
-package ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.scene.impl
-
-import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.lang.ASTNode
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.scene.RenPyScriptSceneStmtImage
-
-class RenPyScriptSceneStmtImageImpl(node: ASTNode) : ASTWrapperPsiElement(node), RenPyScriptSceneStmtImage

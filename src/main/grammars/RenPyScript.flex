@@ -12,7 +12,7 @@ import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token.RenPyScriptTokenT
 %type IElementType
 %unicode
 
-NEW_LINE = \r?\n[ ]*
+NEW_LINE = (\r\n|\r|\n)
 WS = [ ]+
 IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_]*
 IMAGE_LABEL_IDENTIFIER = [a-zA-Z0-9_][a-zA-Z0-9_-]*
@@ -24,55 +24,25 @@ FLOAT_NUMBER = (0?|[1-9][0-9]*)\.[0-9]+
 
 %%
 
-{NEW_LINE} {
-    CharSequence cs = yytext();
-    int spaces = 0;
-    int indentChars = 0;
-    for (int i = 0; i < cs.length(); i++) {
-        char c = cs.charAt(i);
-        if (c == ' ') {
-            spaces++;
-            continue;
-        }
-        if (c == '\r' || c == '\n') {
-            indentChars++;
-            continue;
-        }
-    }
-
+{NEW_LINE} { return RenPyScriptTokenTypes.NEW_LINE; }
+{WS} {
     try {
-        char charPostMatched = yycharat(spaces + indentChars);
-        if (charPostMatched == '\n' || charPostMatched == '\r') return RenPyScriptTokenTypes.NEW_LINE;
-    } catch (IndexOutOfBoundsException e) {
-        return RenPyScriptTokenTypes.NEW_LINE;
-    }
-
-    if (spaces > 0) yybegin(YYINITIAL);
-
-    int prevIndent = getIndents().isEmpty() ? 0 : getIndents().peek();
-    if (spaces > prevIndent) {
-        getIndents().push(spaces);
-        return RenPyScriptTokenTypes.INDENT;
-    } else if (spaces < prevIndent) {
-        while (!getIndents().isEmpty() && getIndents().peek() > spaces) {
-            getIndents().pop();
-            setPendingDedents(getPendingDedents() + 1);
-        }
-        if (getPendingDedents() > 0) {
-            setPendingDedents(getPendingDedents() - 1);
-            return RenPyScriptTokenTypes.DEDENT;
-        }
-    }
-    return RenPyScriptTokenTypes.NEW_LINE;
+        char charBeforeMatched = yycharat(-1);
+        if (charBeforeMatched == '\n' || charBeforeMatched == '\r') return RenPyScriptTokenTypes.INDENT;
+    } catch (IndexOutOfBoundsException e) {}
+    return TokenType.WHITE_SPACE;
 }
-
-{WS}          { return TokenType.WHITE_SPACE; }
 {COMMENT}      { return RenPyScriptTokenTypes.COMMENT; }
 {STRING}       { return RenPyScriptTokenTypes.STRING; }
 {MULTILINE_DIALOG_STRING}       { return RenPyScriptTokenTypes.MULTILINE_DIALOG_STRING; }
 "label"        { return RenPyScriptTokenTypes.LABEL_KEYWORD; }
+"if"        { return RenPyScriptTokenTypes.IF_KEYWORD; }
+"elif"        { return RenPyScriptTokenTypes.ELIF_KEYWORD; }
+"else"        { return RenPyScriptTokenTypes.ELSE_KEYWORD; }
+"while"        { return RenPyScriptTokenTypes.WHILE_KEYWORD; }
 "menu"         { return RenPyScriptTokenTypes.MENU_KEYWORD; }
 "jump"         { return RenPyScriptTokenTypes.JUMP_KEYWORD; }
+"call"         { return RenPyScriptTokenTypes.CALL_KEYWORD; }
 "scene" { return RenPyScriptTokenTypes.SCENE_KEYWORD; }
 "with" { return RenPyScriptTokenTypes.WITH_KEYWORD; }
 "show" { return RenPyScriptTokenTypes.SHOW_KEYWORD; }
@@ -89,6 +59,9 @@ FLOAT_NUMBER = (0?|[1-9][0-9]*)\.[0-9]+
 "stop" { return RenPyScriptTokenTypes.STOP_KEYWORD; }
 "queue" { return RenPyScriptTokenTypes.QUEUE_KEYWORD; }
 "return" { return RenPyScriptTokenTypes.RETURN_KEYWORD; }
+"show screen" { return RenPyScriptTokenTypes.SHOW_SCREEN_KEYWORD; }
+"hide screen" { return RenPyScriptTokenTypes.HIDE_SCREEN_KEYWORD; }
+"call screen" { return RenPyScriptTokenTypes.CALL_SCREEN_KEYWORD; }
 {ONE_LINE_PYTHON_STATEMENT} { return RenPyScriptTokenTypes.ONE_LINE_PYTHON_STATEMENT; }
 "None" { return RenPyScriptTokenTypes.NONE; }
 //"=" { return RenPyScriptTypes.EQ; }

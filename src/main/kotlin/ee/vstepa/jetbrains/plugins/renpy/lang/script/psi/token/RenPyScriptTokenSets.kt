@@ -12,12 +12,20 @@ object RenPyScriptTokenSets {
     @JvmField
     val BLOCK_STATEMENT_STARTS = TokenSet.create(
         RenPyScriptTokenTypes.LABEL_KEYWORD,
-        RenPyScriptTokenTypes.MENU_KEYWORD
+        RenPyScriptTokenTypes.MENU_KEYWORD,
+        RenPyScriptTokenTypes.IF_KEYWORD,
+        RenPyScriptTokenTypes.WHILE_KEYWORD,
     )
 
     @JvmField
     val DIALOGUE_STATEMENT_STARTS = TokenSet.create(
         RenPyScriptTokenTypes.IDENTIFIER,
+        RenPyScriptTokenTypes.STRING,
+        RenPyScriptTokenTypes.MULTILINE_DIALOG_STRING,
+    )
+
+    @JvmField
+    val MENU_CHOICE_CAPTIONS = TokenSet.create(
         RenPyScriptTokenTypes.STRING,
         RenPyScriptTokenTypes.MULTILINE_DIALOG_STRING,
     )
@@ -52,13 +60,6 @@ object RenPyScriptTokenSets {
     @JvmField
     val NEW_LINES = TokenSet.create(
         RenPyScriptTokenTypes.NEW_LINE
-    )
-
-    @JvmField
-    val NEW_LINE_OR_SIMILAR_TO_IT_TOKENS = TokenSet.create(
-        RenPyScriptTokenTypes.NEW_LINE,
-        RenPyScriptTokenTypes.INDENT,
-        RenPyScriptTokenTypes.DEDENT
     )
 
     @JvmField

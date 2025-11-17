@@ -8,7 +8,12 @@ object RenPyScriptTokenTypes {
 
     // Keywords
     @JvmField val LABEL_KEYWORD = RenPyScriptTokenType("LABEL_KEYWORD")
+    @JvmField val IF_KEYWORD = RenPyScriptTokenType("IF_KEYWORD")
+    @JvmField val ELIF_KEYWORD = RenPyScriptTokenType("ELIF_KEYWORD")
+    @JvmField val ELSE_KEYWORD = RenPyScriptTokenType("ELSE_KEYWORD")
+    @JvmField val WHILE_KEYWORD = RenPyScriptTokenType("WHILE_KEYWORD")
     @JvmField val JUMP_KEYWORD = RenPyScriptTokenType("JUMP_KEYWORD")
+    @JvmField val CALL_KEYWORD = RenPyScriptTokenType("CALL_KEYWORD")
     @JvmField val MENU_KEYWORD = RenPyScriptTokenType("MENU_KEYWORD")
     @JvmField val SCENE_KEYWORD = RenPyScriptTokenType("SCENE_KEYWORD")
     @JvmField val WITH_KEYWORD = RenPyScriptTokenType("WITH_KEYWORD")
@@ -22,6 +27,11 @@ object RenPyScriptTokenTypes {
     @JvmField val QUEUE_KEYWORD = RenPyScriptTokenType("QUEUE_KEYWORD")
     @JvmField val RETURN_KEYWORD = RenPyScriptTokenType("RETURN_KEYWORD")
 
+    // Screen display control keywords
+    @JvmField val SHOW_SCREEN_KEYWORD = RenPyScriptTokenType("SHOW_SCREEN_KEYWORD")
+    @JvmField val HIDE_SCREEN_KEYWORD = RenPyScriptTokenType("HIDE_SCREEN_KEYWORD")
+    @JvmField val CALL_SCREEN_KEYWORD = RenPyScriptTokenType("CALL_SCREEN_KEYWORD")
+
     // Keywords - show/scene props
     @JvmField val AS_KEYWORD = RenPyScriptTokenType("AS_KEYWORD")
     @JvmField val AT_KEYWORD = RenPyScriptTokenType("AT_KEYWORD")
@@ -29,9 +39,8 @@ object RenPyScriptTokenTypes {
     @JvmField val ONLAYER_KEYWORD = RenPyScriptTokenType("ONLAYER_KEYWORD")
     @JvmField val ZORDER_KEYWORD = RenPyScriptTokenType("ZORDER_KEYWORD")
 
-    // Indent/Dedent
+    // Indent
     @JvmField val INDENT = RenPyScriptTokenType("INDENT")
-    @JvmField val DEDENT = RenPyScriptTokenType("DEDENT")
 
     // Python
     @JvmField val ONE_LINE_PYTHON_STATEMENT = RenPyScriptTokenType("ONE_LINE_PYTHON_STATEMENT")
