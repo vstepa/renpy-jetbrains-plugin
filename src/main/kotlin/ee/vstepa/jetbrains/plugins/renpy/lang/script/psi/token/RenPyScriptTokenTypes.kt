@@ -1,11 +1,6 @@
 package ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.token
 
-import ee.vstepa.jetbrains.plugins.renpy.lang.script.psi.element.type.RenPyScriptElementTypes
-
 object RenPyScriptTokenTypes {
-    // FILE
-    @JvmField val FILE = RenPyScriptElementTypes.FILE
-
     // Keywords
     @JvmField val LABEL_KEYWORD = RenPyScriptTokenType("LABEL_KEYWORD")
     @JvmField val IF_KEYWORD = RenPyScriptTokenType("IF_KEYWORD")

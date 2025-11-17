@@ -97,5 +97,19 @@
                 language="Ren'Py Script"
                 implementationClass="ee.vstepa.jetbrains.plugins.renpy.lang.script.RenPyScriptParserDefinition"
         />
+
+        <lang.syntaxHighlighterFactory
+                language="Ren'Py Script"
+                implementationClass="ee.vstepa.jetbrains.plugins.renpy.lang.script.RenPyScriptSyntaxHighlighterFactory"
+        />
+
+        <additionalTextAttributes
+                scheme="Default"
+                file="ee/vstepa/jetbrains/plugins/renpy/colorSchemes/RenPyScriptDefault.icls"
+        />
+        <additionalTextAttributes
+                scheme="Darcula"
+                file="ee/vstepa/jetbrains/plugins/renpy/colorSchemes/RenPyScriptDarcula.icls"
+        />
     </extensions>
 </idea-plugin>

@@ -1,0 +1,11 @@
+<scheme name="RenPyScriptDefault" version="0.0.1-252" parent_scheme="Default">
+  <attributes>
+    <option name="REN_PY_SCRIPT_DIFF_LANG_PART">
+      <value>
+        <option name="FOREGROUND" value="9A9A9A"/>
+        <option name="BACKGROUND" value="F5F5F5"/>
+        <option name="FONT_TYPE" value="2"/>
+      </value>
+    </option>
+  </attributes>
+</scheme>
