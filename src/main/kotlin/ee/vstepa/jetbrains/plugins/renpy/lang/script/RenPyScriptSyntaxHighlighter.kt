@@ -90,7 +90,7 @@ class RenPyScriptSyntaxHighlighter : SyntaxHighlighterBase() {
         val BRACKETS = TextAttributesKey.createTextAttributesKey("REN_PY_SCRIPT_BRACKETS", DefaultLanguageHighlighterColors.BRACKETS)
         val DOT = TextAttributesKey.createTextAttributesKey("REN_PY_SCRIPT_DOT", DefaultLanguageHighlighterColors.DOT)
 //        val BAD_CHARACTER = TextAttributesKey.createTextAttributesKey("REN_PY_SCRIPT_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
-        val DIFF_LANG_PART = TextAttributesKey.createTextAttributesKey("REN_PY_SCRIPT_DIFF_LANG_PART", DefaultLanguageHighlighterColors.DOC_COMMENT)
+        val DIFF_LANG_PART = TextAttributesKey.createTextAttributesKey("REN_PY_SCRIPT_DIFF_LANG_PART", DefaultLanguageHighlighterColors.LINE_COMMENT)
 
         private val KEYWORD_KEYS = arrayOf(KEYWORD)
         private val IDENTIFIER_KEYS = arrayOf(IDENTIFIER)
