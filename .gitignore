@@ -44,3 +44,6 @@ bin/
 .idea
 .run
 .intellijPlatform
+
+/jFlex
+/src/main/gen

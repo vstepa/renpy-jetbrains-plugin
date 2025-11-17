@@ -1,0 +1,11 @@
+<scheme name="RenPyScriptDarcula" version="0.0.1-252" parent_scheme="Darcula">
+  <attributes>
+    <option name="REN_PY_SCRIPT_DIFF_LANG_PART">
+      <value>
+        <option name="FOREGROUND" value="9A9A9A"/>
+        <option name="BACKGROUND" value="2B2B2B"/>
+        <option name="FONT_TYPE" value="2"/>
+      </value>
+    </option>
+  </attributes>
+</scheme>
