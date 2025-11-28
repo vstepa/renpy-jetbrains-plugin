@@ -1,12 +1,12 @@
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.2.10"
-    id("org.jetbrains.intellij.platform") version "2.10.4"
+    id("org.jetbrains.intellij.platform") version "2.10.5"
     id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 group = "ee.vstepa.jetbrains.plugins"
-version = "0.0.1-252"
+version = "0.0.2-252"
 
 repositories {
     mavenCentral()
@@ -19,7 +19,7 @@ repositories {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
     intellijPlatform {
-        pycharmCommunity("2025.2.4")
+        pycharmCommunity("2025.2.5")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
 
         // Add necessary plugin dependencies for compilation here, example:
