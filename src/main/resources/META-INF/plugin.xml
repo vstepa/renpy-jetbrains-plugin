@@ -1,7 +1,7 @@
 <idea-plugin require-restart="true">
     <id>ee.vstepa.jetbrains.plugins.renpy</id>
-    <name>Ren'Py Support</name>
-    <version>0.0.1-252</version>
+    <name>Ren'Py Language</name>
+    <version>0.0.2-252</version>
 
     <vendor
             url="https://github.com/vstepa"
@@ -49,10 +49,18 @@
             <li class="main"><code>[!]</code> - important note</li>
         </ul>
         <!--<hr>-->
-        <!--<h2>0.0.2</h2>-->
+        <!--<h2>0.0.3</h2>-->
         <!--<ul>-->
         <!--    <li class="main">...</li>-->
         <!--</ul>-->
+        <!--<hr>-->
+        <h2>0.0.2-252</h2>
+        <h3>First publication preparations</h3>
+        <ul>
+            <li class="main"><code>[*]</code> Changed plugin title from "Ren'Py Support" to "Ren'Py Language", because using "Support" word is not recommended by JetBrains guidelines</li>
+            <li class="main"><code>[*]</code> Added project license - MIT</li>
+            <li class="main"><code>[*]</code> Removed all deprecated and unnecessary files from the build</li>
+        </ul>
         <hr>
         <h2>0.0.1-252</h2>
         <h3>Functional</h3>
