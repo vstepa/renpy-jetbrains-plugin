@@ -18,11 +18,7 @@
 
         <p>Ren'Py (or RenPy) Visual Novel Engine support.</p>
 
-        <br>
-        <hr>
-        <br>
-
-        <h1>⚠️ Prototype notice ⚠️</h1>
+        <h2>⚠️ Prototype notice ⚠️</h2>
         <p>This plugin is a <b>prototype developed as part of an academic thesis project.</b></p>
         <p>It provides basic syntax highlighting and limited language support for <b>Ren'Py</b>, but <b>does not yet cover all Ren'Py features, statements, or editor integrations.</b></p>
         <br>
@@ -32,7 +28,6 @@
         <p>If you’d like to support future development, you’re welcome to <b>leave feature suggestions or feedback in the reviews.</b></p>
 
         <br>
-        <hr>
         <br>
 
         <div>
