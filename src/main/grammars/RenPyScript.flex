@@ -29,7 +29,10 @@ FLOAT_NUMBER = (0?|[1-9][0-9]*)\.[0-9]+
     try {
         char charBeforeMatched = yycharat(-1);
         if (charBeforeMatched == '\n' || charBeforeMatched == '\r') return RenPyScriptTokenTypes.INDENT;
-    } catch (IndexOutOfBoundsException e) {}
+    } catch (IndexOutOfBoundsException e) {
+        // Because we get such exception only if we get whitespace char as the first char in the file and it always means INDENT
+        return RenPyScriptTokenTypes.INDENT;
+    }
     return TokenType.WHITE_SPACE;
 }
 {COMMENT}      { return RenPyScriptTokenTypes.COMMENT; }

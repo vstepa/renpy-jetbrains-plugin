@@ -7,6 +7,6 @@ import ee.vstepa.jetbrains.plugins.renpy.filetype.RenPyScriptFileType
 import ee.vstepa.jetbrains.plugins.renpy.lang.RenPyScriptLanguage
 
 class RenPyScriptFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, RenPyScriptLanguage) {
-    override fun getFileType(): FileType = RenPyScriptFileType.INSTANCE
+    override fun getFileType(): FileType = RenPyScriptFileType
     override fun toString() = fileType.name
 }
